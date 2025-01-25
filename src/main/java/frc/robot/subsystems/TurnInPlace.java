@@ -15,10 +15,10 @@ public class TurnInPlace extends Command {
   private Vision m_vision;
   private SwerveRequest.FieldCentric m_drive;
 
-  public TurnInPlace(CommandSwerveDrivetrain drive_train, SwerveRequest.FieldCentric drive, Vision vision) {
+  public TurnInPlace(CommandSwerveDrivetrain drive_train, Vision vision) {
     m_drive_train = drive_train;
     m_vision = vision;
-    m_drive = drive;
+    m_drive = new SwerveRequest.FieldCentric();
     addRequirements(drive_train, vision);
   }
 
@@ -31,9 +31,24 @@ public class TurnInPlace extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    // if sees object
     final double max_speed = .5;
-    m_drive_train.applyRequest(() ->
-    m_drive.withRotationalRate(m_vision.getHorizontalOffset() * max_speed));
+    final double offset = m_vision.getHorizontalOffset();
+    final double threshold = 1;
+    System.out.println("In execite, executing rotational rate " + (m_vision.getHorizontalOffset()));
+
+    if( offset < -threshold){
+      m_drive_train.setControl(
+        // new SwerveRequest.FieldCentric()
+        m_drive.withRotationalRate(max_speed)
+      );
+    }else if (offset > threshold) {
+      m_drive_train.setControl(
+        // new SwerveRequest.FieldCentric()
+        m_drive.withRotationalRate(-max_speed)
+      );
+    }
   }
 
   // Called once the command ends or is interrupted.

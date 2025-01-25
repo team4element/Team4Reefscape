@@ -54,7 +54,7 @@ public class RobotContainer {
         );
 
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.x().whileTrue(new TurnInPlace(drivetrain, drive ,vision));
+        joystick.x().whileTrue(new TurnInPlace(drivetrain ,vision));
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
