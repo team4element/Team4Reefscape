@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.TurnInPlace;
 import frc.robot.subsystems.Vision;
 
 public class RobotContainer {
@@ -33,9 +34,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
-
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
     public final Vision vision = new Vision();
 
     public RobotContainer() {
@@ -55,6 +54,7 @@ public class RobotContainer {
         );
 
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        joystick.x().whileTrue(new TurnInPlace(drivetrain, drive ,vision));
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
