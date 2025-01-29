@@ -66,4 +66,14 @@ public class Vision extends SubsystemBase {
     LimelightHelpers.setPipelineIndex("", 0);
   }
 
+  public double getHorizontalOffset() {
+    return LimelightHelpers.getTX("");
+  }
+
+  public double getVerticalOffset() {
+    // LimelightHelpers.getBotPose3d("");
+    return LimelightHelpers.getTY("");
+  }
+
+
 }

@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.MoveHorizontal;
+import frc.robot.subsystems.TurnInPlace;
 import frc.robot.subsystems.Vision;
 
 public class RobotContainer {
@@ -58,6 +60,8 @@ public class RobotContainer {
         );
 
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        joystick.x().whileTrue(new TurnInPlace(drivetrain ,vision));
+        joystick.y().whileTrue(new MoveHorizontal(drivetrain ,vision));
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
