@@ -27,7 +27,6 @@ public class Vision extends SubsystemBase {
     double ta = LimelightHelpers.getTA(""); // Target area (0% to 100% of image)
     boolean hasTarget = LimelightHelpers.getTV(""); // Do you have a valid target?
 
-    // System.out.println(String.format("tx: %f ty: %f ta: %f hasTarget: %b", tx, ty, ta, hasTarget));
   }
 
   /**
