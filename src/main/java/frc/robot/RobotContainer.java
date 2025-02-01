@@ -17,6 +17,7 @@ import frc.robot.Commands.AutoMove;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
 
 public class RobotContainer {
@@ -37,6 +38,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         configureBindings();
+        ShuffleboardHelper.getInstance().initialize();
     }
 
     private void configureBindings() {

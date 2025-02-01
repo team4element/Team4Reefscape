@@ -12,12 +12,11 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoMove extends Command {
-  private ShuffleboardLayout m_turn_threshold, m_vertical_threshold;
-
   private double m_rotation_speed;
   private double m_vertical_speed;
   private double m_horizontal_speed;
@@ -35,8 +34,6 @@ public class AutoMove extends Command {
     m_rotation_speed = m_horizontal_speed = m_vertical_speed = 0;
     m_threshold = 0;
     m_action = action;
-    m_turn_threshold = Shuffleboard.getTab("Vision").getLayout("Turn Threshold");
-    m_vertical_threshold = Shuffleboard.getTab("Vision").getLayout("Horizontal Threshold");
     m_drive = new SwerveRequest.FieldCentric();
     
     addRequirements(drive_train, vision);
@@ -48,7 +45,7 @@ public class AutoMove extends Command {
       switch (m_action) {
         case TURN_IN_PLACE: 
           m_rotation_speed = .5;
-          m_threshold = m_turn_threshold.getDouble(m_default_threshold);
+          m_threshold = ShuffleboardHelper.getInstance().getTurnThreshold();
           break;
         case MOVE_HORIZONTAL: 
           m_horizontal_speed = .5;
