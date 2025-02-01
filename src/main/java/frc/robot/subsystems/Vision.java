@@ -21,12 +21,7 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Basic targeting data
-    double tx = LimelightHelpers.getTX(""); // Horizontal offset from crosshair to target in degrees
-    double ty = LimelightHelpers.getTY(""); // Vertical offset from crosshair to target in degrees
-    double ta = LimelightHelpers.getTA(""); // Target area (0% to 100% of image)
-    boolean hasTarget = LimelightHelpers.getTV(""); // Do you have a valid target?
-
+  
   }
 
   /**
@@ -36,7 +31,7 @@ public class Vision extends SubsystemBase {
    */
   public void controlLED(LedState led_state) {
     switch (led_state) {
-      case ON:
+      case ON: 
         LimelightHelpers.setLEDMode_ForceOn("");
         break;
       case OFF:
@@ -66,5 +61,9 @@ public class Vision extends SubsystemBase {
   public double getVerticalOffset() {
     // LimelightHelpers.getBotPose3d("");
     return LimelightHelpers.getTY("");
+  }
+
+  public boolean hasTarget() {
+    return LimelightHelpers.getTV("");
   }
 }

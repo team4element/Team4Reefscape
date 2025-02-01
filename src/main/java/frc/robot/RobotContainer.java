@@ -13,8 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.Commands.MoveHorizontal;
-import frc.robot.Commands.TurnInPlace;
+import frc.robot.Commands.AutoMove;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -53,8 +52,8 @@ public class RobotContainer {
         );
 
         ControllerConstants.driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        ControllerConstants.driverController.x().whileTrue(new TurnInPlace(drivetrain ,vision));
-        ControllerConstants.driverController.y().whileTrue(new MoveHorizontal(drivetrain ,vision));
+        ControllerConstants.driverController.x().whileTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.TURN_IN_PLACE));
+        ControllerConstants.driverController.y().whileTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_VERTICAL));
         ControllerConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-ControllerConstants.driverController.getLeftY(), -ControllerConstants.driverController.getLeftX()))
         ));

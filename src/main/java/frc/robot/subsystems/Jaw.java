@@ -15,13 +15,9 @@ import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.JawConstants;
 
 public class Jaw extends SubsystemBase {
-    //TalonFX m_Algae = new TalonFX(JawConstants.algaeId);
-    private WPI_VictorSPX m_motorController = new WPI_VictorSPX(JawConstants.algaeId);
-
-    TalonFX m_innerBottom;
-    TalonFX m_outerBottom;
-    TalonFX m_jawPivot;
-
+    private TalonFX m_innerBottom;
+    private TalonFX m_outerBottom;
+    private TalonFX m_jawPivot;
 
     int m_invert = -1;
     double m_angle;
@@ -30,13 +26,12 @@ public class Jaw extends SubsystemBase {
 
     public MotorOutputConfigs currentConfigs = new MotorOutputConfigs();
 
-    //How Use??????
-    // public static enum Directions{
-    //     INTAKECORAL,
-    //     OUTTAKECORAL,
-    //     INTAKEALGAE,
-    //     OUTTAKEALGAE
-    // }
+    public static enum JawAction{
+        INTAKE_CORAL,
+        OUTTAKE_CORAL,
+        INTAKE_ALGAE,
+        OUTTAKE_ALGAE
+    }
 
     public Jaw(){
 
@@ -54,10 +49,22 @@ public class Jaw extends SubsystemBase {
 
     }
 
+    public void controlMotors(JawAction action){
+        switch (action) {
+            case INTAKE_CORAL: {
+                
+            } break;
+            default:
+                break;
+        }
+    }
  
-    //TODO: See if this is needed for later
-    public void angleOff(){
-        m_jawPivot.set(0);
+    public void motorOff(TalonFX motor){
+        motor.set(0);
+    }
+
+    public void motorOff(WPI_VictorSPX motor){
+        motor.set(0);
     }
 
     public void zeroEncoder(){
