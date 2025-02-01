@@ -7,16 +7,18 @@ package frc.robot.Commands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+//import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+//import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Vision;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class TurnInPlace extends Command {
-   private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
-   private GenericEntry turnThreshold = tab.add("Vision Threshold", 1)
+  private Double m_default = VisionConstants.defaultThreshold;
+
+  private GenericEntry turnThreshold = MoveHorizontal.tab.add("Vision Threshold", m_default)
          .getEntry();
   
   private CommandSwerveDrivetrain m_drive_train;
@@ -43,7 +45,7 @@ public class TurnInPlace extends Command {
     // if sees object
     final double max_speed = .5;
     final double offset = m_vision.getHorizontalOffset();
-    final double threshold = turnThreshold.getDouble(1);
+    final double threshold = turnThreshold.getDouble(m_default);
     System.out.println("In execite, executing rotational rate " + (m_vision.getHorizontalOffset()));
 
     if( offset < -threshold){

@@ -7,11 +7,14 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Vision;
 
 public class MoveHorizontal extends Command{    
-  private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
-   private GenericEntry horizontalThreshold = tab.add("Vision Threshold", 1)
+  private Double m_default = VisionConstants.defaultThreshold;
+
+  public static ShuffleboardTab tab = Shuffleboard.getTab("Vision");
+  private GenericEntry horizontalThreshold = tab.add("Horizontal Threshold", m_default)
          .getEntry();
 
   private CommandSwerveDrivetrain m_drive_train;
@@ -38,7 +41,7 @@ public class MoveHorizontal extends Command{
     // if sees object
     final double max_speed = .5;
     final double offset = m_vision.getHorizontalOffset();
-    final double threshold = horizontalThreshold.getDouble(1);
+    final double threshold = horizontalThreshold.getDouble(m_default);
     //System.out.println("In execite, executing rotational rate " + (m_vision.getHorizontalOffset()));
     System.out.println(threshold);
 
