@@ -15,8 +15,13 @@ public class Vision extends SubsystemBase {
     BLINK
   }
 
+  public enum Pipeline {
+    TWO_DIMENSIONAL,
+    THREE_DIMENSIONAL,
+  }
+
   public Vision() {
-    switchPipeline(0);
+    switchPipeline(Pipeline.TWO_DIMENSIONAL);
   }
 
   @Override
@@ -50,7 +55,7 @@ public class Vision extends SubsystemBase {
    * Switch between pipelines
    * @param pipeline The pipeline you want to switch to
    */
-  public void switchPipeline(int pipeline) {
+  public void switchPipeline(Pipeline pipeline) {
     LimelightHelpers.setPipelineIndex("", 0);
   }
 

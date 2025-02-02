@@ -26,7 +26,7 @@ public class AutoMove extends Command {
   private Vision m_vision;
   private SwerveRequest.FieldCentric m_drive;
   private double m_threshold;
-  private final double m_default_threshold = 5;
+  private boolean m_is_finished;
 
   public AutoMove(CommandSwerveDrivetrain drive_train, Vision vision, CommandSwerveDrivetrain.AutoMoveAction action) {
     m_drive_train = drive_train;
@@ -34,7 +34,9 @@ public class AutoMove extends Command {
     m_rotation_speed = m_horizontal_speed = m_vertical_speed = 0;
     m_threshold = 0;
     m_action = action;
+    
     m_drive = new SwerveRequest.FieldCentric();
+    
     
     addRequirements(drive_train, vision);
   }
@@ -42,10 +44,13 @@ public class AutoMove extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_is_finished = false;
       switch (m_action) {
         case TURN_IN_PLACE: 
           m_rotation_speed = .5;
-          m_threshold = ShuffleboardHelper.getInstance().getTurnThreshold();
+          m_vision.switchPipeline(Vision.Pipeline.TWO_DIMENSIONAL);
+          // m_threshold = ShuffleboardHelper.getInstance().getTurnThreshold();
+          m_threshold = 5;
           break;
         case MOVE_HORIZONTAL: 
           m_horizontal_speed = .5;
@@ -65,25 +70,31 @@ public class AutoMove extends Command {
 
     switch (m_action) {
       case MOVE_HORIZONTAL: //fallthrough
-      case TURN_IN_PLACE: offset = m_vision.getVerticalOffset(); break;
-      case MOVE_VERTICAL: offset = m_vision.getHorizontalOffset(); break;
+      case TURN_IN_PLACE: offset = m_vision.getHorizontalOffset(); break;
+      case MOVE_VERTICAL: offset = m_vision.getVerticalOffset(); break;
       default: break;
     }
+
+    System.out.printf("\r\n threshold %f | offset: %f", m_threshold, offset);
 
     if (m_vision.hasTarget()) {
       if (offset < -m_threshold) {
         m_drive_train.setControl(
             m_drive
               .withRotationalRate(m_rotation_speed)
-              .withVelocityX(m_horizontal_speed)
-              .withVelocityY(m_vertical_speed));
+              .withVelocityX(m_vertical_speed)
+              .withVelocityY(m_horizontal_speed));
       } else if (offset > m_threshold) {
         m_drive_train.setControl(
           m_drive
           .withRotationalRate(-m_rotation_speed)
-          .withVelocityX(-m_horizontal_speed)
-          .withVelocityY(-m_vertical_speed));
+          .withVelocityX(-m_vertical_speed)
+          .withVelocityY(-m_horizontal_speed));
+      }else{
+        m_is_finished = true;
       }
+    }else{
+      m_is_finished = true;
     }
   }
 
@@ -96,6 +107,6 @@ public class AutoMove extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return m_is_finished;
   }
 }
