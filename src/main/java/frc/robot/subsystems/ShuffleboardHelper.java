@@ -1,11 +1,7 @@
 package frc.robot.subsystems;
 
-import java.util.Map;
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardComponent;
 
 public class ShuffleboardHelper {
     private static ShuffleboardHelper instance;

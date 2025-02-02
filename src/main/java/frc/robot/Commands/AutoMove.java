@@ -5,14 +5,9 @@
 package frc.robot.Commands;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
 
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -36,8 +31,7 @@ public class AutoMove extends Command {
     m_action = action;
     
     m_drive = new SwerveRequest.FieldCentric();
-    
-    
+  
     addRequirements(drive_train, vision);
   }
 

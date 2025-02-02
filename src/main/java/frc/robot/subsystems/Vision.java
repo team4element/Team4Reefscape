@@ -21,7 +21,8 @@ public class Vision extends SubsystemBase {
   }
 
   public Vision() {
-    switchPipeline(Pipeline.TWO_DIMENSIONAL);
+    switchPipeline(Pipeline.THREE_DIMENSIONAL);
+
   }
 
   @Override
@@ -56,7 +57,7 @@ public class Vision extends SubsystemBase {
    * @param pipeline The pipeline you want to switch to
    */
   public void switchPipeline(Pipeline pipeline) {
-    LimelightHelpers.setPipelineIndex("", 0);
+    LimelightHelpers.setPipelineIndex("", pipeline.ordinal());
   }
 
   public double getHorizontalOffset() {
