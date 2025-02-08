@@ -53,7 +53,7 @@ public class RobotContainer {
             )
         );
 
-        ControllerConstants.driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        ControllerConstants.driverController.a().whileTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_VERTICAL));
         ControllerConstants.driverController.x().onTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.TURN_IN_PLACE));
         ControllerConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-ControllerConstants.driverController.getLeftY(), -ControllerConstants.driverController.getLeftX()))

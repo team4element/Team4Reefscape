@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 
@@ -67,6 +68,10 @@ public class Vision extends SubsystemBase {
   public double getVerticalOffset() {
     // LimelightHelpers.getBotPose3d("");
     return LimelightHelpers.getTY("");
+  }
+
+  public Pose3d getTarget3DPose(){
+    return LimelightHelpers.getTargetPose3d_RobotSpace("");
   }
 
   public boolean hasTarget() {

@@ -8,6 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -29,9 +30,9 @@ public class AutoMove extends Command {
     m_rotation_speed = m_horizontal_speed = m_vertical_speed = 0;
     m_threshold = 0;
     m_action = action;
-    
+
     m_drive = new SwerveRequest.FieldCentric();
-  
+
     addRequirements(drive_train, vision);
   }
 
@@ -40,17 +41,21 @@ public class AutoMove extends Command {
   public void initialize() {
     m_is_finished = false;
       switch (m_action) {
-        case TURN_IN_PLACE: 
-          m_rotation_speed = .5;
+        case TURN_IN_PLACE:
+          m_rotation_speed = 1.5;
           m_vision.switchPipeline(Vision.Pipeline.TWO_DIMENSIONAL);
-          // m_threshold = ShuffleboardHelper.getInstance().getTurnThreshold();
+          m_threshold = ShuffleboardHelper.getInstance().getTurnThreshold();
           m_threshold = 5;
           break;
-        case MOVE_HORIZONTAL: 
-          m_horizontal_speed = .5;
+        case MOVE_HORIZONTAL:
+          m_vision.switchPipeline(Vision.Pipeline.THREE_DIMENSIONAL);
+          m_horizontal_speed = 1.5;
+          m_threshold = ShuffleboardHelper.getInstance().getHorizontalThreshold();
           break;
-        case MOVE_VERTICAL: 
-          m_vertical_speed = .5;
+        case MOVE_VERTICAL:
+          m_vision.switchPipeline(Vision.Pipeline.THREE_DIMENSIONAL);
+          m_vertical_speed = -1.5;
+          m_threshold = 2.0;
           break;
         default: break;
       }
@@ -65,7 +70,9 @@ public class AutoMove extends Command {
     switch (m_action) {
       case MOVE_HORIZONTAL: //fallthrough
       case TURN_IN_PLACE: offset = m_vision.getHorizontalOffset(); break;
-      case MOVE_VERTICAL: offset = m_vision.getVerticalOffset(); break;
+      case MOVE_VERTICAL: offset = m_vision.getTarget3DPose().getZ();
+        System.out.printf("\r\n X: %f, Y: %f, Z: %f", m_vision.getTarget3DPose().getX(), m_vision.getTarget3DPose().getY(), m_vision.getTarget3DPose().getZ());
+      break;
       default: break;
     }
 
