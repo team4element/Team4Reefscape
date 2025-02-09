@@ -22,7 +22,7 @@ public class Vision extends SubsystemBase {
   }
 
   public Vision() {
-    switchPipeline(Pipeline.THREE_DIMENSIONAL);
+    switchPipeline(Pipeline.TWO_DIMENSIONAL);
 
   }
 
