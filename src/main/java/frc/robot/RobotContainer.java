@@ -8,11 +8,12 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.AutoMove;
 import frc.robot.Constants.ControllerConstants;
@@ -41,8 +42,13 @@ public class RobotContainer {
     public final Vision vision = new Vision();
 
     public RobotContainer() {
+        // creates a menu on shuffle board for autons
+        sendableAuton = AutoBuilder.buildAutoChooser();
+
         configureBindings();
         ShuffleboardHelper.getInstance().initialize();
+
+        SmartDashboard.putData("Auto Chooser", sendableAuton);
     }
 
     private void configureBindings() {
@@ -76,6 +82,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return sendableAuton.getSelected();
     }
 }
