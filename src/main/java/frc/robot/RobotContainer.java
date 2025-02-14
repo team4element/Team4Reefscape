@@ -14,11 +14,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.AutoMove;
+import frc.robot.Commands.LevelSetPoints;
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.JawConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.LowerJaw.JawAction;
+import frc.robot.subsystems.LowerJaw;
+
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -33,8 +40,11 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
+    //Subsystems?
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    public final Vision vision = new Vision();
+    public final Vision m_vision = new Vision();
+    public final LowerJaw m_lowerJaw = new LowerJaw();
+    public final Elevator m_elevator = new Elevator();
 
     public RobotContainer() {
         configureBindings();
@@ -54,7 +64,7 @@ public class RobotContainer {
         );
 
         ControllerConstants.driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        ControllerConstants.driverController.x().onTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.TURN_IN_PLACE));
+        ControllerConstants.driverController.x().onTrue(new AutoMove(drivetrain, m_vision, CommandSwerveDrivetrain.AutoMoveAction.TURN_IN_PLACE));
         ControllerConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-ControllerConstants.driverController.getLeftY(), -ControllerConstants.driverController.getLeftX()))
         ));
@@ -67,8 +77,13 @@ public class RobotContainer {
         ControllerConstants.driverController.start().and(ControllerConstants.driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // reset the field-centric heading on left bumper press
         ControllerConstants.driverController.leftBumper().whileTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
         drivetrain.registerTelemetry(logger::telemeterize);
+
+        //Operator
+        ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawAction.INTAKE_CORAL, JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawAction.OUTTAKE_CORAL, JawConstants.intakeSpeed));
+
+        //ControllerConstants.operatorController.a().onTrue(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint));
     }
 
     public Command getAutonomousCommand() {
