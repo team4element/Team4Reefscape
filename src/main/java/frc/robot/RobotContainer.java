@@ -44,11 +44,10 @@ public class RobotContainer {
     public RobotContainer() {
         // creates a menu on shuffle board for autons
         sendableAuton = AutoBuilder.buildAutoChooser();
+        SmartDashboard.putData("Auto Chooser", sendableAuton);
 
         configureBindings();
         ShuffleboardHelper.getInstance().initialize();
-
-        SmartDashboard.putData("Auto Chooser", sendableAuton);
     }
 
     private void configureBindings() {
