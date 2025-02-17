@@ -9,7 +9,6 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
@@ -77,7 +76,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         ),
         new SysIdRoutine.Mechanism(
             volts -> setControl(m_steerCharacterization.withVolts(volts)),
-            null,
+            null,                                                                      
             this
         )
     );
@@ -239,6 +238,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
+
+        // System.out.println(LimelightHelpers.getBotPose2d(""));
+        // System.out.println(getState().Pose);
     }
 
     private void startSimThread() {

@@ -7,9 +7,12 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
+import frc.robot.Constants.VisionConstants;
 
 public class Vision extends SubsystemBase {
 
+  public double lastKnownTargetDistanceInches;
+ 
   public enum LedState {
     ON,
     OFF,
@@ -28,8 +31,29 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-  
+  if (hasTarget()) {
+    double angleToGoalDegrees = VisionConstants.limelightMountAngleDegrees + getVerticalOffset();
+    double angleToGoalRadians = angleToGoalDegrees * VisionConstants.radianMeasurement;
+
+    //calculate distance
+    lastKnownTargetDistanceInches = (VisionConstants.goalHeightInches - VisionConstants.limelightLensHeightInches) 
+    / Math.tan(angleToGoalRadians);
+  } 
+    //System.out.println(distanceFromLimelightToGoalInches);
   }
+
+  // public double VerticalOffset(){
+
+  //   double offset;
+
+  //   if(hasTarget()){
+  //      offset = getVerticalOffset();
+  //   }
+  //   // else {
+  //   //   offset = 0;
+  //   // }
+  //   return offset;
+  // }
 
   /**
    * Controls the LED on the limelight
@@ -77,4 +101,5 @@ public class Vision extends SubsystemBase {
   public boolean hasTarget() {
     return LimelightHelpers.getTV("");
   }
+
 }
