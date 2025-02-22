@@ -11,11 +11,21 @@ public class JawConstants {
     public static final double limitForward = 5;
     public static final double limitBackwards = -5;
 
-    public static final double currentLimit = 80;
+    public static final double statorLimit = 80;
+    public static final double supplyLimit = 80;
+
+    public static final double lowerStatorLimit = 80;
+    public static final double lowerSupplyLimit = 80;
 
     public static final double intakeSpeed = 0.5;
 
     public static final double rampUpTime = .8; //Ramp up time for future shooting of the algae to the net
 
+    public static final double kP = 0.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
 
+    public static final String tableP = "Jaw P";
+    public static final String tableI = "Jaw I";
+    public static final String tableD = "Jaw D";
 }

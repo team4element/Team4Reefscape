@@ -12,6 +12,8 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.AutoMove;
 import frc.robot.Commands.LevelSetPoints;
@@ -21,10 +23,13 @@ import frc.robot.Constants.JawConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Jaw;
 import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.LowerJaw.JawAction;
+import frc.robot.subsystems.Jaw.JawAction;
+import frc.robot.subsystems.LowerJaw.LowerJawAction;
 import frc.robot.subsystems.LowerJaw;
+
 
 
 public class RobotContainer {
@@ -43,8 +48,10 @@ public class RobotContainer {
     //Subsystems?
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final Vision m_vision = new Vision();
+    public final Jaw m_jaw = new Jaw();
     public final LowerJaw m_lowerJaw = new LowerJaw();
     public final Elevator m_elevator = new Elevator();
+  
 
     public RobotContainer() {
         configureBindings();
@@ -62,7 +69,7 @@ public class RobotContainer {
                     .withRotationalRate(-ControllerConstants.driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-
+        //Driver Controls
         ControllerConstants.driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
         ControllerConstants.driverController.x().onTrue(new AutoMove(drivetrain, m_vision, CommandSwerveDrivetrain.AutoMoveAction.TURN_IN_PLACE));
         ControllerConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
@@ -79,9 +86,15 @@ public class RobotContainer {
         ControllerConstants.driverController.leftBumper().whileTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        //Operator
-        ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawAction.INTAKE_CORAL, JawConstants.intakeSpeed));
-        ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawAction.OUTTAKE_CORAL, JawConstants.intakeSpeed));
+        //Operator COntrols
+        ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(LowerJawAction.INTAKE_CORAL, JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(LowerJawAction.OUTTAKE_CORAL, JawConstants.intakeSpeed));
+
+        ControllerConstants.operatorController.rightTrigger().whileTrue(m_jaw.c_intakeAlgae(JawAction.INTAKE_ALGAE, JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftTrigger().whileTrue(m_jaw.c_intakeAlgae(JawAction.OUTTAKE_ALGAE, JawConstants.intakeSpeed));
+
+        ControllerConstants.operatorController.povUp().whileTrue( m_elevator.c_moveElevator(m_elevator, ElevatorConstants.manualSpeed));
+        ControllerConstants.operatorController.povDown().whileTrue( m_elevator.c_moveElevator(m_elevator, ElevatorConstants.manualSpeed * -1));
 
         //ControllerConstants.operatorController.a().onTrue(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint));
     }
@@ -89,4 +102,13 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
     }
+
+
+    // private SequentialCommandGroup LevelOne(double rpmTop, double rpmBot, double timeout, double elevatorSpeed, double armAngle) {
+    // return new SequentialCommandGroup(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint),
+    
+    // new SequentialCommandGroup(m_lowerJaw.c_intakeCoral(JawAction.OUTTAKE_CORAL, .5).withTimeout(1)));
+    
+    // }
+
 }

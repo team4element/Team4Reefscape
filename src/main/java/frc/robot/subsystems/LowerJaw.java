@@ -5,9 +5,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -29,12 +29,16 @@ public class LowerJaw extends Jaw {
 
     public MotorOutputConfigs currentConfigs = new MotorOutputConfigs();
 
-    public static enum JawAction{
+    public static enum LowerJawAction{
         INTAKE_CORAL,
         OUTTAKE_CORAL,        
     }
 
     public LowerJaw(){
+         TalonFXConfiguration config = new TalonFXConfiguration();
+
+        TalonFXConfigurator innerConfigurator = m_innerBottomFollower.getConfigurator();
+        TalonFXConfigurator pivotConfigurator = m_jawPivot.getConfigurator();
 
         m_innerBottomFollower = new TalonFX(JawConstants.innerBottomFollowerId);
         m_outerBottomLeader = new TalonFX(JawConstants.outerBottomLeaderId);
@@ -49,32 +53,29 @@ public class LowerJaw extends Jaw {
         currentConfigs.Inverted = InvertedValue.Clockwise_Positive;
    m_outerBottomLeader.getConfigurator().apply(currentConfigs);
 
-        m_jawPivot.setNeutralMode(NeutralModeValue.Brake);        
+        m_jawPivot.setNeutralMode(NeutralModeValue.Brake);     
+        
+        m_limitConfig.StatorCurrentLimit = JawConstants.lowerStatorLimit;
+        m_limitConfig.StatorCurrentLimitEnable = true;
+
+        m_limitConfig.SupplyCurrentLimit = JawConstants.lowerSupplyLimit;
+        m_limitConfig.SupplyCurrentLimitEnable = true;
+
+        //should seperate the config constants later to make it unique to each motor 
+        innerConfigurator.apply(m_limitConfig);
+        pivotConfigurator.apply(m_limitConfig);
     }
     
     public void setLowerJaw(double speed){
         m_outerBottomLeader.setControl(m_outerControlRequest.withOutput(speed));
     }
 
-    public void controlMotors(JawAction action){
-        switch (action) {
-            case INTAKE_CORAL: 
-                
-                break;
-            case OUTTAKE_CORAL:
-                break;            
-            default:
-                break;
-        }
-    }
+
  
     public void motorOff(TalonFX motor){
         motor.set(0);
     }
 
-    public void motorOff(WPI_VictorSPX motor){
-        motor.set(0);
-    }
 
     //Pivot to move the Coral intake
     public void Pivot(double speed){
@@ -89,7 +90,9 @@ public class LowerJaw extends Jaw {
     }
 
   public void periodic(){
+        System.out.println(m_jawPivot.getPosition()); //This is to find the encoder value for code. 
 
+        setPID();
   }
 
   //Commands
@@ -99,12 +102,11 @@ public class LowerJaw extends Jaw {
 }
 
  //TODO: This work??????
- public Command c_intakeCoral(JawAction jawAction, double speed){
+ public Command c_intakeCoral(LowerJawAction lowerAction, double speed){
     speed = Math.abs(speed);
-    double modifiedSpeed = jawAction == JawAction.INTAKE_CORAL ? speed : -speed;
+    double modifiedSpeed = lowerAction == LowerJawAction.INTAKE_CORAL ? speed : -speed;
 
-    return startEnd(() -> setLowerJaw(modifiedSpeed), () -> setLowerJaw(0.55));   
+    return startEnd(() -> setLowerJaw(modifiedSpeed), () -> setLowerJaw(0.5));   
 }
-
     
 }
