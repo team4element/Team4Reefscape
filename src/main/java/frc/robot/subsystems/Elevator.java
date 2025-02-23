@@ -13,7 +13,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.units.CurrentUnit;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,11 +27,8 @@ public class Elevator extends SubsystemBase{
     private DutyCycleOut m_leftDutyCycle;
 
     double target = 0;
-    double m_speed;
 
     final PIDController m_pid;
-
-    Elevator m_elevator = new Elevator();
 
     PositionVoltage m_request;
     final VelocityVoltage m_requestLeft;
@@ -49,12 +45,8 @@ public class Elevator extends SubsystemBase{
         CORAL_STATION
     }
 
-    public Elevator(){    
+    public Elevator(){
         TalonFXConfiguration config = new TalonFXConfiguration();
-
-        TalonFXConfigurator leftConfigurator = m_leftLeader.getConfigurator();
-        TalonFXConfigurator rightConfigurator = m_rightFollower.getConfigurator();
-
         m_pid = new PIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
 
         m_rightFollower = new TalonFX(ElevatorConstants.rightFollowerId);
@@ -67,6 +59,11 @@ public class Elevator extends SubsystemBase{
         m_requestLeft = new VelocityVoltage(0).withSlot(0);
         m_requestRight = new VelocityVoltage(0).withSlot(0);
 
+        m_leftDutyCycle = new DutyCycleOut(1);
+
+        TalonFXConfigurator leftConfigurator = m_leftLeader.getConfigurator();
+        TalonFXConfigurator rightConfigurator = m_rightFollower.getConfigurator();
+
         m_leftLeader.getConfigurator().apply(config);
         m_rightFollower.getConfigurator().apply(config);
 
@@ -76,37 +73,34 @@ public class Elevator extends SubsystemBase{
         m_limitConfig.SupplyCurrentLimit = ElevatorConstants.supplyLimit;
         m_limitConfig.StatorCurrentLimitEnable = true;
 
-        //make the current limit seperately later on 
+        //make the current limit seperately later on
         leftConfigurator.apply(m_limitConfig);
         rightConfigurator.apply(m_limitConfig);
-    
+
         //This sets the motor to rotate counterclockwise
         currentConfigs.Inverted = InvertedValue.Clockwise_Positive;
         m_leftLeader.getConfigurator().apply(currentConfigs);
-        
-        //Adds a brake mode to the motors
-        m_rightFollower.setNeutralMode(NeutralModeValue.Brake);
-        m_leftLeader.setNeutralMode(NeutralModeValue.Brake);
 
         SmartDashboard.putNumber(ElevatorConstants.tableP, ElevatorConstants.kP);
         SmartDashboard.putNumber(ElevatorConstants.tableI, ElevatorConstants.kI);
         SmartDashboard.putNumber(ElevatorConstants.tableD, ElevatorConstants.kD);
     }
-    
+
 
     public void setMotors(double speed) {
-        m_leftLeader.setControl(m_leftDutyCycle.withOutput(speed));        
+        m_leftLeader.setControl(m_leftDutyCycle.withOutput(speed));
      }
 
      public void motorOff(TalonFX motor){
         motor.set(0);
+        motor.setNeutralMode(NeutralModeValue.Brake);
     }
 
 
     public void goToSetPoint(double setPoint){
         target = setPoint;
         m_leftLeader.setControl(m_request.withPosition(setPoint));
-    } 
+    }
 
     public double getCurrentPosition() {
         return m_leftLeader.getPosition().getValueAsDouble();
@@ -122,11 +116,8 @@ public class Elevator extends SubsystemBase{
       }
 
 
-      public Command c_moveElevator(Elevator elevator, double speed){
-        m_elevator = elevator;
-        m_speed = speed;
-
-                return startEnd(() -> setMotors(m_speed), () -> motorOff(m_leftLeader)); 
+      public Command c_moveElevator(double speed){
+        return startEnd(() -> setMotors(speed), () -> motorOff(m_leftLeader));
     }
 
     @Override
