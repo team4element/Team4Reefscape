@@ -9,7 +9,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision;
@@ -17,7 +16,6 @@ import frc.robot.subsystems.Vision;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class Shift extends Command {
   /** Creates a new Shift. */
-   private CommandSwerveDrivetrain.AutoMoveAction m_action;
 
   private CommandSwerveDrivetrain m_drive_train;
   private Vision m_vision;
@@ -25,12 +23,10 @@ public class Shift extends Command {
   private double m_threshold, m_max_speed;
   private boolean m_is_finished;
   private PIDController m_pid;
-  private CommandXboxController m_controller;
 
-  public Shift(CommandSwerveDrivetrain drive_train, Vision vision, CommandXboxController controller, double max_speed) {
+  public Shift(CommandSwerveDrivetrain drive_train, Vision vision, double max_speed) {
     m_drive_train = drive_train;
     m_vision = vision;
-    m_controller = controller;
     m_threshold = 0;
     m_max_speed = max_speed;
 
@@ -56,7 +52,6 @@ public class Shift extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double offset = 0;
     //testing horizontal movement (in progress and might change back to angular movement)
     if (m_vision.hasTarget() && m_threshold < Math.abs(m_vision.getHorizontalOffset())) { // + 1.85
         m_drive_train.setControl(

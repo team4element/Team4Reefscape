@@ -17,7 +17,6 @@ import frc.robot.subsystems.Vision;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class HoldAngle extends Command {
-  private CommandSwerveDrivetrain.AutoMoveAction m_action;
 
   private CommandSwerveDrivetrain m_drive_train;
   private Vision m_vision;

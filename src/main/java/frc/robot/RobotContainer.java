@@ -11,14 +11,11 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.ApproachApriltag;
 import frc.robot.Commands.AutoMove;
 import frc.robot.Commands.HoldAngle;
 import frc.robot.Commands.Shift;
-import frc.robot.Commands.LevelSetPoints;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.JawConstants;
@@ -28,11 +25,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Jaw;
 import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.Jaw.JawAction;
-import frc.robot.subsystems.LowerJaw.LowerJawAction;
 import frc.robot.subsystems.LowerJaw;
-
-
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -70,10 +63,13 @@ public class RobotContainer {
                     .withRotationalRate(-ControllerConstants.driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
+
+        m_lowerJaw.setDefaultCommand(m_lowerJaw.c_pivotManual(ControllerConstants.operatorController.getLeftY()));
+
         ControllerConstants.driverController.a().whileTrue(new AutoMove(drivetrain, m_vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_VERTICAL));
         ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed));
         //[]\ControllerConstants.driverController.b().whileTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_HORIZONTAL));
-        ControllerConstants.driverController.b().whileTrue(new Shift(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed));
+        ControllerConstants.driverController.b().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed));
         // ControllerConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
         //     point.withModuleDirection(new Rotation2d(-ControllerConstants.driverController.getLeftY(), -ControllerConstants.driverController.getLeftX()))
         // ));
@@ -93,9 +89,9 @@ public class RobotContainer {
 
         //Operator Controls
         ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
-        ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
-       ControllerConstants.operatorController.rightTrigger().whileTrue(m_jaw.c_intakeAlgae(JawAction.INTAKE_ALGAE, JawConstants.intakeSpeed));
-        ControllerConstants.operatorController.leftTrigger().whileTrue(m_jaw.c_intakeAlgae(JawAction.OUTTAKE_ALGAE, JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(-JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.rightTrigger().whileTrue(m_jaw.c_intakeAlgae(JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftTrigger().whileTrue(m_jaw.c_intakeAlgae(-JawConstants.intakeSpeed));
 
         ControllerConstants.operatorController.povUp().whileTrue( m_elevator.c_moveElevator(ElevatorConstants.manualSpeed));
         ControllerConstants.operatorController.povDown().whileTrue( m_elevator.c_moveElevator(-ElevatorConstants.manualSpeed));

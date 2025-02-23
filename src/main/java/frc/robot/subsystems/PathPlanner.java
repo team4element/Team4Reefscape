@@ -1,25 +1,10 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
- import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.Constants.TunerConstants;
-
-
 //This class holds all of the necessary functions and code for pathplanner to work and communicat with the robot
 public class PathPlanner{
 
    public static CommandSwerveDrivetrain m_drivetrain;
 
-
-   public static RobotConfig m_config;
   //  public static Pose2d m_position = new Pose2d(new Translation2d(), new Rotation2d(
   //   TunerConstants.defaultPathPlannerAngle)
   //   );
