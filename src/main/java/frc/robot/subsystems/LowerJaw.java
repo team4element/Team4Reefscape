@@ -35,25 +35,21 @@ public class LowerJaw extends Jaw {
     }
 
     public LowerJaw(){
-         TalonFXConfiguration config = new TalonFXConfiguration();
-
-        TalonFXConfigurator innerConfigurator = m_innerBottomFollower.getConfigurator();
-        TalonFXConfigurator pivotConfigurator = m_jawPivot.getConfigurator();
-
         m_innerBottomFollower = new TalonFX(JawConstants.innerBottomFollowerId);
         m_outerBottomLeader = new TalonFX(JawConstants.outerBottomLeaderId);
         m_innerBottomFollower.setControl(new Follower(JawConstants.outerBottomLeaderId, false));
-    
+        
         m_jawPivot = new TalonFX(JawConstants.jawPivotId);  
-
+        m_outerControlRequest = new DutyCycleOut(1);
+        
+        TalonFXConfigurator innerConfigurator = m_innerBottomFollower.getConfigurator();
+        TalonFXConfigurator pivotConfigurator = m_jawPivot.getConfigurator();
         //InnerBottom is going CCW or CW+
         currentConfigs.Inverted = InvertedValue.Clockwise_Positive;
-   m_innerBottomFollower.getConfigurator().apply(currentConfigs);
+        m_innerBottomFollower.getConfigurator().apply(currentConfigs);
          //OuterBottom is going CW or CCW+
         currentConfigs.Inverted = InvertedValue.Clockwise_Positive;
-   m_outerBottomLeader.getConfigurator().apply(currentConfigs);
-
-        m_jawPivot.setNeutralMode(NeutralModeValue.Brake);     
+        m_outerBottomLeader.getConfigurator().apply(currentConfigs);
         
         m_limitConfig.StatorCurrentLimit = JawConstants.lowerStatorLimit;
         m_limitConfig.StatorCurrentLimitEnable = true;
@@ -64,6 +60,7 @@ public class LowerJaw extends Jaw {
         //should seperate the config constants later to make it unique to each motor 
         innerConfigurator.apply(m_limitConfig);
         pivotConfigurator.apply(m_limitConfig);
+
     }
     
     public void setLowerJaw(double speed){
@@ -74,6 +71,7 @@ public class LowerJaw extends Jaw {
  
     public void motorOff(TalonFX motor){
         motor.set(0);
+        m_jawPivot.setNeutralMode(NeutralModeValue.Brake);     
     }
 
 
@@ -90,7 +88,7 @@ public class LowerJaw extends Jaw {
     }
 
   public void periodic(){
-        System.out.println(m_jawPivot.getPosition()); //This is to find the encoder value for code. 
+        // System.out.println(m_jawPivot.getPosition()); //This is to find the encoder value for code. 
 
         setPID();
   }
@@ -101,12 +99,8 @@ public class LowerJaw extends Jaw {
     return Commands.run(() -> Pivot(ControllerConstants.operatorController.getLeftY() * .2), this);
 }
 
- //TODO: This work??????
- public Command c_intakeCoral(LowerJawAction lowerAction, double speed){
-    speed = Math.abs(speed);
-    double modifiedSpeed = lowerAction == LowerJawAction.INTAKE_CORAL ? speed : -speed;
-
-    return startEnd(() -> setLowerJaw(modifiedSpeed), () -> setLowerJaw(0.5));   
+ public Command c_intakeCoral(double speed){
+    return startEnd(() -> setLowerJaw(speed), () -> motorOff(m_outerBottomLeader));   
 }
     
 }

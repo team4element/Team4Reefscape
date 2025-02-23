@@ -43,11 +43,11 @@ public class Jaw extends SubsystemBase {
     }
 
     public Jaw(){
-        TalonFXConfigurator bottomConfigurator = m_innerBottomFollower.getConfigurator();
-        TalonFXConfigurator outerConfigurator = m_outerBottomLeader.getConfigurator();
-
         m_outerBottomLeader = new TalonFX(JawConstants.outerBottomLeaderId);
         m_innerBottomFollower = new TalonFX(JawConstants.innerBottomFollowerId);
+
+        TalonFXConfigurator bottomConfigurator = m_innerBottomFollower.getConfigurator();
+        TalonFXConfigurator outerConfigurator = m_outerBottomLeader.getConfigurator();
 
         m_topLeader = new TalonFX(JawConstants.TopLeaderId);
         m_innerBottomFollower.setControl(new Follower(JawConstants.outerBottomLeaderId, true));
