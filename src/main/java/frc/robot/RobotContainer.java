@@ -11,16 +11,28 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.ApproachApriltag;
 import frc.robot.Commands.AutoMove;
 import frc.robot.Commands.HoldAngle;
 import frc.robot.Commands.Shift;
+import frc.robot.Commands.LevelSetPoints;
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.JawConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Jaw;
 import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Jaw.JawAction;
+import frc.robot.subsystems.LowerJaw.LowerJawAction;
+import frc.robot.subsystems.LowerJaw;
+
+
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -36,7 +48,11 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    public final Vision vision = new Vision();
+    public final Vision m_vision = new Vision();
+    public final Jaw m_jaw = new Jaw();
+    public final LowerJaw m_lowerJaw = new LowerJaw();
+    public final Elevator m_elevator = new Elevator();
+  
 
     public RobotContainer() {
         configureBindings();
@@ -54,30 +70,49 @@ public class RobotContainer {
                     .withRotationalRate(-ControllerConstants.driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-
-        ControllerConstants.driverController.a().whileTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_VERTICAL));
-        ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, vision, ControllerConstants.driverController, MaxSpeed));
+        ControllerConstants.driverController.a().whileTrue(new AutoMove(drivetrain, m_vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_VERTICAL));
+        ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed));
         //[]\ControllerConstants.driverController.b().whileTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_HORIZONTAL));
-        ControllerConstants.driverController.b().whileTrue(new Shift(drivetrain, vision, ControllerConstants.driverController, MaxSpeed));
+        ControllerConstants.driverController.b().whileTrue(new Shift(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed));
         // ControllerConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
         //     point.withModuleDirection(new Rotation2d(-ControllerConstants.driverController.getLeftY(), -ControllerConstants.driverController.getLeftX()))
         // ));
-        ControllerConstants.driverController.y().whileTrue(new ApproachApriltag(drivetrain, vision, 13, 3.0));
-
+        ControllerConstants.driverController.y().whileTrue(new ApproachApriltag(drivetrain, m_vision, 13, 3.0));
         // Run SysId routines when holding back/start and X/Y.
 
         // Note that each routine should be run exactly once in a single log.
+
+	//Driver Controls
         ControllerConstants.driverController.back().and(ControllerConstants.driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         ControllerConstants.driverController.back().and(ControllerConstants.driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         ControllerConstants.driverController.start().and(ControllerConstants.driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         ControllerConstants.driverController.start().and(ControllerConstants.driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // reset the field-centric heading on left bumper press
         ControllerConstants.driverController.leftBumper().whileTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
         drivetrain.registerTelemetry(logger::telemeterize);
+
+        //Operator Controls
+        ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
+       ControllerConstants.operatorController.rightTrigger().whileTrue(m_jaw.c_intakeAlgae(JawAction.INTAKE_ALGAE, JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftTrigger().whileTrue(m_jaw.c_intakeAlgae(JawAction.OUTTAKE_ALGAE, JawConstants.intakeSpeed));
+
+        ControllerConstants.operatorController.povUp().whileTrue( m_elevator.c_moveElevator(ElevatorConstants.manualSpeed));
+        ControllerConstants.operatorController.povDown().whileTrue( m_elevator.c_moveElevator(-ElevatorConstants.manualSpeed));
+
+        //ControllerConstants.operatorController.a().onTrue(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint));
     }
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
     }
+
+
+    // private SequentialCommandGroup LevelOne(double rpmTop, double rpmBot, double timeout, double elevatorSpeed, double armAngle) {
+    // return new SequentialCommandGroup(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint),
+    
+    // new SequentialCommandGroup(m_lowerJaw.c_intakeCoral(JawAction.OUTTAKE_CORAL, .5).withTimeout(1)));
+    
+    // }
+
 }
