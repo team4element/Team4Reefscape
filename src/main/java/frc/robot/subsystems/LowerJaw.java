@@ -89,8 +89,8 @@ public class LowerJaw extends Jaw {
 
   //Commands
   //Assigns a part of the controller to move the pivot
-  public Command c_pivotManual(double speed){
-    return run(() -> Pivot(speed));
+  public Command c_pivotManual(){
+    return Commands.run(() -> Pivot(ControllerConstants.operatorController.getLeftY()), this);
 }
 
  public Command c_intakeCoral(double speed){
