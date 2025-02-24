@@ -138,7 +138,7 @@ public class Elevator extends SubsystemBase{
         // TODO Auto-generated method stub
         super.periodic();
 
-        System.out.printf("%s | %s", m_leftLeader.getRotorPosition().toString(), m_rightFollower.getRotorPosition());
+        // System.out.printf("%s | %s", m_leftLeader.getRotorPosition().toString(), m_rightFollower.getRotorPosition());
 
         setPID();
     }

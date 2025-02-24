@@ -78,7 +78,7 @@ public class LowerJaw extends Jaw {
     //Pivot to move the Coral intake
     public void Pivot(double speed){
         final double max_speed = .5;
-        System.out.println(speed);
+        // System.out.println(speed);
         m_jawPivot.setControl(m_topControlRequest.withOutput(speed * max_speed));
     }
 
