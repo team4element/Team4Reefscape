@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.JawConstants;
 
-public class LowerJaw extends Jaw {
+public class LowerJaw extends UpperJaw {
     private TalonFX m_innerBottom;
     private TalonFX m_outerBottom;
    

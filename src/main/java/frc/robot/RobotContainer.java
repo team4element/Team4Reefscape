@@ -22,7 +22,7 @@ import frc.robot.Constants.JawConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Jaw;
+import frc.robot.subsystems.UpperJaw;
 import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.LowerJaw;
@@ -42,7 +42,7 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final Vision m_vision = new Vision();
-    public final Jaw m_jaw = new Jaw();
+    public final UpperJaw m_upperJaw = new UpperJaw();
     public final LowerJaw m_lowerJaw = new LowerJaw();
     public final Elevator m_elevator = new Elevator();
   
@@ -90,8 +90,8 @@ public class RobotContainer {
         //Operator Controls
         ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
         ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(-JawConstants.intakeSpeed));
-        ControllerConstants.operatorController.rightTrigger().whileTrue(m_jaw.c_intakeAlgae(JawConstants.intakeSpeed));
-        ControllerConstants.operatorController.leftTrigger().whileTrue(m_jaw.c_intakeAlgae(-JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.rightTrigger().whileTrue(m_upperJaw.c_intakeAlgae(JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftTrigger().whileTrue(m_upperJaw.c_intakeAlgae(-JawConstants.intakeSpeed));
 
         ControllerConstants.operatorController.povUp().whileTrue( m_elevator.c_moveElevator(ElevatorConstants.manualSpeed));
         ControllerConstants.operatorController.povDown().whileTrue( m_elevator.c_moveElevator(-ElevatorConstants.manualSpeed));
@@ -102,7 +102,6 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
     }
-
 
     // private SequentialCommandGroup LevelOne(double rpmTop, double rpmBot, double timeout, double elevatorSpeed, double armAngle) {
     // return new SequentialCommandGroup(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint),
