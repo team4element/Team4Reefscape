@@ -88,8 +88,6 @@ public class Elevator extends SubsystemBase{
         SmartDashboard.putNumber(ElevatorConstants.tableP, ElevatorConstants.kP);
         SmartDashboard.putNumber(ElevatorConstants.tableI, ElevatorConstants.kI);
         SmartDashboard.putNumber(ElevatorConstants.tableD, ElevatorConstants.kD);
-
-        zeroPosition();
     }
 
 
@@ -104,7 +102,6 @@ public class Elevator extends SubsystemBase{
 
 
     public void goToSetPoint(double setPoint){
-        System.out.println(setPoint);
         m_leftLeader.setControl(m_request.withPosition(setPoint));
     }
 
@@ -129,16 +126,10 @@ public class Elevator extends SubsystemBase{
         return startEnd(() -> setMotors(speed), () -> motorOff(m_leftLeader));
     }
 
-    public Command c_zeroEncoder(){
-       return run(() -> zeroPosition());
-    }
-
     @Override
     public void periodic() {
         // TODO Auto-generated method stub
         super.periodic();
-
-        // System.out.printf("%s | %s", m_leftLeader.getRotorPosition().toString(), m_rightFollower.getRotorPosition());
 
         setPID();
     }
@@ -154,10 +145,4 @@ public class Elevator extends SubsystemBase{
 
         return 3;
     }
-
-    public void zeroPosition(){
-        m_leftLeader.setPosition(0);
-        m_rightFollower.setPosition(0);
-    }
-
 }
