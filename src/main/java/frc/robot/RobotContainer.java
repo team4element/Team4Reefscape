@@ -46,7 +46,7 @@ public class RobotContainer {
     public final Jaw m_jaw = new Jaw();
     public final LowerJaw m_lowerJaw = new LowerJaw();
     public final Elevator m_elevator = new Elevator();
-  
+
 
     public RobotContainer() {
         configureBindings();
@@ -97,8 +97,7 @@ public class RobotContainer {
         ControllerConstants.operatorController.y().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_3));
         ControllerConstants.operatorController.x().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_4));
         ControllerConstants.operatorController.start().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.CORAL_STATION));
-        
-        ControllerConstants.operatorController.back().whileTrue(m_elevator.c_zeroEncoder());
+        ControllerConstants.operatorController.back().whileTrue(m_lowerJaw.c_goToSetPoint(Elevator.Level.LEVEL_1));
 
         //ControllerConstants.operatorController.a().onTrue(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint));
     }
@@ -107,15 +106,11 @@ public class RobotContainer {
         return Commands.print("No autonomous command configured");
     }
 
-    public void onEnable(){
-        m_elevator.zeroPosition();
-    }
-
     // private SequentialCommandGroup LevelOne(double rpmTop, double rpmBot, double timeout, double elevatorSpeed, double armAngle) {
     // return new SequentialCommandGroup(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint),
-    
+
     // new SequentialCommandGroup(m_lowerJaw.c_intakeCoral(JawAction.OUTTAKE_CORAL, .5).withTimeout(1)));
-    
+
     // }
 
 }

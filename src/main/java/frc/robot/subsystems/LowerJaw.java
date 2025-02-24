@@ -8,17 +8,20 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.PositionVoltage;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.JawConstants;
+import frc.robot.subsystems.Elevator.Level;
 
-public class LowerJaw extends Jaw {
+public class LowerJaw extends Jaw {    
     private TalonFX m_innerBottom;
     private TalonFX m_outerBottom;
    
     private TalonFX m_jawPivot;
+    private PositionVoltage m_request;
 
     private DutyCycleOut m_outerControlRequest;
     private DutyCycleOut m_innerControlRequest;
@@ -36,10 +39,23 @@ public class LowerJaw extends Jaw {
     }
 
     public LowerJaw(){
+        m_request = new PositionVoltage(0).withSlot(0);
+        
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
+        config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
+        config.Feedback.SensorToMechanismRatio = 12;
+        config.Slot0.kP =  .01;
+        config.Slot0.kD = .001;
+        config.Slot0.kV = .005;
+        config.Slot0.kA = .005;
+        
         m_innerBottom = new TalonFX(JawConstants.innerBottomId);
         m_outerBottom = new TalonFX(JawConstants.outerBottomId);
         
-        m_jawPivot = new TalonFX(JawConstants.jawPivotId);  
+        m_jawPivot = new TalonFX(JawConstants.jawPivotId);
+        m_jawPivot.getConfigurator().apply(config);
+
         m_outerControlRequest = new DutyCycleOut(.5);
         m_innerControlRequest = new DutyCycleOut(.5);
         m_topControlRequest = new DutyCycleOut(.5);
@@ -82,11 +98,6 @@ public class LowerJaw extends Jaw {
         m_jawPivot.setControl(m_topControlRequest.withOutput(speed * max_speed));
     }
 
-  public void periodic(){
-        // System.out.println(m_jawPivot.getPosition()); //This is to find the encoder value for code. 
-        setPID();
-  }
-
   //Commands
   //Assigns a part of the controller to move the pivot
   public Command c_pivotManual(){
@@ -96,5 +107,36 @@ public class LowerJaw extends Jaw {
  public Command c_intakeCoral(double speed){
     return startEnd(() -> setLowerJaw(speed), () -> motorsOff());   
 }
+
+public void goToSetPoint(double setPoint){
+    m_jawPivot.setControl(m_request.withPosition(setPoint));
+}
     
+@Override
+public void periodic() {
+    super.periodic();
+
+    System.out.printf("%s\rn", m_jawPivot.getRotorPosition().toString());
+}
+
+private double positionToSetpoint(Level level){
+    switch (level) {
+        case LEVEL_1: return .5;
+        case LEVEL_2: return 0;
+        case LEVEL_3: return 0;
+        case LEVEL_4: return 0;
+        case CORAL_STATION: return 0;
+    }
+
+    return 0;
+}
+
+public void jawOff(){
+    m_jawPivot.set(0);
+}
+
+public Command c_goToSetPoint(Level position){
+    return startEnd(() -> goToSetPoint(positionToSetpoint(position)), () -> jawOff());
+}
+
 }
