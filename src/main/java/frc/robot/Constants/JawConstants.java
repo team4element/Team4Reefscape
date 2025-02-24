@@ -17,7 +17,8 @@ public class JawConstants {
     public static final double lowerStatorLimit = 80;
     public static final double lowerSupplyLimit = 80;
 
-    public static final double intakeSpeed = .5;
+    public static final double intakeSpeed = .1;
+    public static final double outtakeSpeed = -.4;
 
     public static final double rampUpTime = .8; //Ramp up time for future shooting of the algae to the net
 

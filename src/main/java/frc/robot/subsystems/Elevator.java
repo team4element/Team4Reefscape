@@ -28,8 +28,6 @@ public class Elevator extends SubsystemBase{
 
     double target = 0;
 
-    final PIDController m_pid;
-
     PositionVoltage m_request;
     final VelocityVoltage m_requestLeft;
     final VelocityVoltage m_requestRight;
@@ -37,7 +35,7 @@ public class Elevator extends SubsystemBase{
     CurrentLimitsConfigs m_limitConfig = new CurrentLimitsConfigs();
 
     //The different levels the elevator needs a setpoint for
-    public static enum Levels{
+    public static enum Level{
         LEVEL_1,
         LEVEL_2,
         LEVEL_3,
@@ -47,12 +45,14 @@ public class Elevator extends SubsystemBase{
 
     public Elevator(){
         TalonFXConfiguration config = new TalonFXConfiguration();
-        m_pid = new PIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
+        config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
+        config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
+        config.Feedback.SensorToMechanismRatio = 9;
+        config.Slot0.kP = 10;
+
 
         m_rightFollower = new TalonFX(ElevatorConstants.rightFollowerId);
         m_leftLeader = new TalonFX(ElevatorConstants.leftLeaderId);
-
-        m_rightFollower.setControl(new Follower(ElevatorConstants.leftLeaderId, true));
 
         m_request = new PositionVoltage(target).withSlot(0);
 
@@ -63,6 +63,8 @@ public class Elevator extends SubsystemBase{
 
         TalonFXConfigurator leftConfigurator = m_leftLeader.getConfigurator();
         TalonFXConfigurator rightConfigurator = m_rightFollower.getConfigurator();
+
+        m_rightFollower.setControl(new Follower(ElevatorConstants.leftLeaderId, true));
 
         m_leftLeader.getConfigurator().apply(config);
         m_rightFollower.getConfigurator().apply(config);
@@ -79,11 +81,13 @@ public class Elevator extends SubsystemBase{
 
         //This sets the motor to rotate counterclockwise
         currentConfigs.Inverted = InvertedValue.Clockwise_Positive;
-        m_leftLeader.getConfigurator().apply(currentConfigs);
+        m_leftLeader.getConfigurator().apply(config);
 
         SmartDashboard.putNumber(ElevatorConstants.tableP, ElevatorConstants.kP);
         SmartDashboard.putNumber(ElevatorConstants.tableI, ElevatorConstants.kI);
         SmartDashboard.putNumber(ElevatorConstants.tableD, ElevatorConstants.kD);
+
+        zeroPosition();
     }
 
 
@@ -98,8 +102,12 @@ public class Elevator extends SubsystemBase{
 
 
     public void goToSetPoint(double setPoint){
-        target = setPoint;
+        System.out.println(setPoint);
         m_leftLeader.setControl(m_request.withPosition(setPoint));
+    }
+
+    public Command c_goToSetPoint(Level level){
+        return startEnd(() -> goToSetPoint(goToLevel(level)), () -> motorOff(m_leftLeader));
     }
 
     public double getCurrentPosition() {
@@ -112,7 +120,6 @@ public class Elevator extends SubsystemBase{
         double i = SmartDashboard.getNumber(ElevatorConstants.tableI, ElevatorConstants.kI);
         double d = SmartDashboard.getNumber(ElevatorConstants.tableD, ElevatorConstants.kD);
 
-        m_pid.setPID(p, i, d);
       }
 
 
@@ -120,12 +127,35 @@ public class Elevator extends SubsystemBase{
         return startEnd(() -> setMotors(speed), () -> motorOff(m_leftLeader));
     }
 
+    public Command c_zeroEncoder(){
+       return run(() -> zeroPosition());
+    }
+
     @Override
     public void periodic() {
         // TODO Auto-generated method stub
         super.periodic();
 
+        System.out.printf("%s | %s", m_leftLeader.getRotorPosition().toString(), m_rightFollower.getRotorPosition());
+
         setPID();
+    }
+
+    public double goToLevel(Level level){
+        switch(level){
+            case LEVEL_1: return 2.0;
+            case LEVEL_2: return 3.6;
+            case LEVEL_3: return 4.6;
+            case LEVEL_4: return 6.0;
+            case CORAL_STATION: return 4.0;
+        }
+
+        return 3;
+    }
+
+    public void zeroPosition(){
+        m_leftLeader.setPosition(0);
+        m_rightFollower.setPosition(0);
     }
 
 }

@@ -26,6 +26,7 @@ import frc.robot.subsystems.Jaw;
 import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.LowerJaw;
+import frc.robot.subsystems.Elevator.Level;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -89,12 +90,19 @@ public class RobotContainer {
 
         //Operator Controls
         ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
-        ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(-JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.outtakeSpeed));
         ControllerConstants.operatorController.rightTrigger().whileTrue(m_jaw.c_intakeAlgae(JawConstants.intakeSpeed));
         ControllerConstants.operatorController.leftTrigger().whileTrue(m_jaw.c_intakeAlgae(-JawConstants.intakeSpeed));
 
         ControllerConstants.operatorController.povUp().whileTrue( m_elevator.c_moveElevator(ElevatorConstants.manualSpeed));
         ControllerConstants.operatorController.povDown().whileTrue( m_elevator.c_moveElevator(-ElevatorConstants.manualSpeed));
+        ControllerConstants.operatorController.a().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_1));
+        ControllerConstants.operatorController.b().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_2));
+        ControllerConstants.operatorController.y().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_3));
+        ControllerConstants.operatorController.x().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_4));
+        ControllerConstants.operatorController.start().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.CORAL_STATION));
+        
+        ControllerConstants.operatorController.back().whileTrue(m_elevator.c_zeroEncoder());
 
         //ControllerConstants.operatorController.a().onTrue(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint));
     }
@@ -103,6 +111,9 @@ public class RobotContainer {
         return Commands.print("No autonomous command configured");
     }
 
+    public void onEnable(){
+        m_elevator.zeroPosition();
+    }
 
     // private SequentialCommandGroup LevelOne(double rpmTop, double rpmBot, double timeout, double elevatorSpeed, double armAngle) {
     // return new SequentialCommandGroup(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint),
