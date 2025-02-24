@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.ApproachApriltag;
 import frc.robot.Commands.AutoMove;
 import frc.robot.Commands.HoldAngle;
+import frc.robot.Commands.IntakeAlgae;
 import frc.robot.Commands.Shift;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.ElevatorConstants;
@@ -26,6 +27,7 @@ import frc.robot.subsystems.UpperJaw;
 import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.LowerJaw;
+import frc.robot.subsystems.Elevator.Level;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -67,7 +69,7 @@ public class RobotContainer {
         m_lowerJaw.setDefaultCommand(m_lowerJaw.c_pivotManual());
 
         ControllerConstants.driverController.a().whileTrue(new AutoMove(drivetrain, m_vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_VERTICAL));
-        ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed));
+        ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed, MaxAngularRate));
         //ControllerConstants.driverController.b().whileTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_HORIZONTAL));
         ControllerConstants.driverController.b().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed));
         // ControllerConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
@@ -79,22 +81,25 @@ public class RobotContainer {
         // Note that each routine should be run exactly once in a single log.
 
 	//Driver Controls
-        ControllerConstants.driverController.back().and(ControllerConstants.driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        ControllerConstants.driverController.back().and(ControllerConstants.driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        ControllerConstants.driverController.start().and(ControllerConstants.driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        ControllerConstants.driverController.start().and(ControllerConstants.driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // reset the field-centric heading on left bumper press
         ControllerConstants.driverController.leftBumper().whileTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         drivetrain.registerTelemetry(logger::telemeterize);
 
         //Operator Controls
         ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
-        ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(-JawConstants.intakeSpeed));
-        ControllerConstants.operatorController.rightTrigger().whileTrue(m_upperJaw.c_intakeAlgae(JawConstants.intakeSpeed));
-        ControllerConstants.operatorController.leftTrigger().whileTrue(m_upperJaw.c_intakeAlgae(-JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.outtakeSpeed));
+        ControllerConstants.operatorController.rightTrigger().whileTrue(new IntakeAlgae(m_upperJaw, m_lowerJaw, JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftTrigger().whileTrue(new IntakeAlgae(m_upperJaw, m_lowerJaw, -JawConstants.intakeSpeed));
 
         ControllerConstants.operatorController.povUp().whileTrue( m_elevator.c_moveElevator(ElevatorConstants.manualSpeed));
         ControllerConstants.operatorController.povDown().whileTrue( m_elevator.c_moveElevator(-ElevatorConstants.manualSpeed));
+        ControllerConstants.operatorController.a().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_1));
+        ControllerConstants.operatorController.b().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_2));
+        ControllerConstants.operatorController.y().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_3));
+        ControllerConstants.operatorController.x().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_4));
+        ControllerConstants.operatorController.start().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.CORAL_STATION));
+        
+        ControllerConstants.operatorController.back().whileTrue(m_elevator.c_zeroEncoder());
 
         //ControllerConstants.operatorController.a().onTrue(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint));
     }
@@ -102,7 +107,6 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
     }
-
     // private SequentialCommandGroup LevelOne(double rpmTop, double rpmBot, double timeout, double elevatorSpeed, double armAngle) {
     // return new SequentialCommandGroup(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint),
     

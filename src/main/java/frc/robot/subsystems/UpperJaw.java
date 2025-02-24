@@ -55,13 +55,11 @@ public class UpperJaw extends SubsystemBase {
         m_limitConfig.StatorCurrentLimitEnable = true;
     }
 
-
     public void setJaw(double speed){
         m_top.setControl(m_topControlRequest.withOutput(speed));
     }
   
- 
-    public void motorsOff(){
+    public void motorOff(){
         m_top.set(0);
         m_top.setNeutralMode(NeutralModeValue.Brake);
     }
@@ -74,13 +72,7 @@ public class UpperJaw extends SubsystemBase {
         m_pid.setPID(p, i, d);
       }
     
-     //Algae Intake
- public Command c_intakeAlgae(double speed){
-    return startEnd(() -> setJaw(speed), () -> motorsOff());   
-}
-
   public void periodic(){
     setPID();
-  }
-    
+  } 
 }

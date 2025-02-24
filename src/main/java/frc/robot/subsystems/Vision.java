@@ -91,7 +91,7 @@ public class Vision extends SubsystemBase {
 
   public double getVerticalOffset() {
     // LimelightHelpers.getBotPose3d("");
-    return LimelightHelpers.getTY("");
+    return -LimelightHelpers.getTY("");
   }
 
   public Pose3d getTarget3DPose(){
