@@ -3,7 +3,7 @@ package frc.robot.Constants;
 public class VisionConstants {
 
     public static double deadband = 0.3;
-    public static double rotationalDeadband = 0.1;
+    public static double rotationalDeadband = 0.4;
 
     public static double radianMeasurement = 3.14159 / 180.0;
 
@@ -17,14 +17,14 @@ public class VisionConstants {
     public static double goalHeightInches = 58; 
 
     //constants for shift command
-    public static double Shift_P = 0.0244;
+    public static double Shift_P = 0.02;
     public static double Shift_I = 0;
-    public static double Shift_D = 0;
+    public static double Shift_D = 0.0005;
 
     //constants for HoldAngle command
-    public static double HoldAngle_P = 0.027;
+    public static double HoldAngle_P = 0.005;
     public static double HoldAngle_I = 0;
-    public static double HoldAngle_D = 0;
+    public static double HoldAngle_D = .0000001;
 
     //constants for AutoMove command
     public static double AutoMove_P = 0.3;

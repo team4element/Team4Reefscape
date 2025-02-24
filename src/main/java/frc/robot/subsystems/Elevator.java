@@ -48,8 +48,10 @@ public class Elevator extends SubsystemBase{
         config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
         config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
         config.Feedback.SensorToMechanismRatio = 9;
-        config.Slot0.kP = 10;
-
+        config.Slot0.kP =  9;
+        config.Slot0.kD = .1;
+        config.Slot0.kV = .005;
+        config.Slot0.kA = .005;
 
         m_rightFollower = new TalonFX(ElevatorConstants.rightFollowerId);
         m_leftLeader = new TalonFX(ElevatorConstants.leftLeaderId);
@@ -143,10 +145,10 @@ public class Elevator extends SubsystemBase{
 
     public double goToLevel(Level level){
         switch(level){
-            case LEVEL_1: return 2.0;
+            case LEVEL_1: return 2.3;
             case LEVEL_2: return 3.6;
-            case LEVEL_3: return 4.6;
-            case LEVEL_4: return 6.0;
+            case LEVEL_3: return 5.6;
+            case LEVEL_4: return 7.3;
             case CORAL_STATION: return 4.0;
         }
 

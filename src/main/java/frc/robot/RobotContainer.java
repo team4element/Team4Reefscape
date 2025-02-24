@@ -68,7 +68,7 @@ public class RobotContainer {
         m_lowerJaw.setDefaultCommand(m_lowerJaw.c_pivotManual());
 
         ControllerConstants.driverController.a().whileTrue(new AutoMove(drivetrain, m_vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_VERTICAL));
-        ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed));
+        ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed, MaxAngularRate));
         //ControllerConstants.driverController.b().whileTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_HORIZONTAL));
         ControllerConstants.driverController.b().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed));
         // ControllerConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
@@ -80,10 +80,6 @@ public class RobotContainer {
         // Note that each routine should be run exactly once in a single log.
 
 	//Driver Controls
-        ControllerConstants.driverController.back().and(ControllerConstants.driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        ControllerConstants.driverController.back().and(ControllerConstants.driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        ControllerConstants.driverController.start().and(ControllerConstants.driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        ControllerConstants.driverController.start().and(ControllerConstants.driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // reset the field-centric heading on left bumper press
         ControllerConstants.driverController.leftBumper().whileTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         drivetrain.registerTelemetry(logger::telemeterize);

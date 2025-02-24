@@ -4,6 +4,7 @@
 
 package frc.robot.Commands;
 
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -25,19 +26,22 @@ public class HoldAngle extends Command {
   private boolean m_is_finished;
   private PIDController m_pid;
   private CommandXboxController m_controller;
+  private double m_max_angle_rate;
+  private VelocityVoltage m_requestLeft;
 
-  public HoldAngle(CommandSwerveDrivetrain drive_train, Vision vision, CommandXboxController controller, double max_speed) {
+
+  public HoldAngle(CommandSwerveDrivetrain drive_train, Vision vision, CommandXboxController controller, double max_speed, double max_angle_rate) {
     m_drive_train = drive_train;
     m_vision = vision;
     m_controller = controller;
     m_threshold = 0;
     m_max_speed = max_speed;
+    m_max_angle_rate = max_angle_rate;
 
     m_pid = new PIDController(VisionConstants.HoldAngle_P, VisionConstants.HoldAngle_I, VisionConstants.HoldAngle_D); //TODO better tune
 
     m_drive = new SwerveRequest.FieldCentric()
       .withDeadband(VisionConstants.deadband)
-      .withRotationalDeadband(VisionConstants.rotationalDeadband)
       .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
       .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo);
 
@@ -63,9 +67,9 @@ public class HoldAngle extends Command {
     if (m_vision.hasTarget()) {
         m_drive_train.setControl(
           m_drive
-          .withRotationalRate(m_pid.calculate(m_vision.getHorizontalOffset()) * m_max_speed)
-          .withVelocityX(-m_controller.getLeftX() * m_max_speed) 
-          .withVelocityY(-m_controller.getLeftY() * m_max_speed));
+          .withRotationalRate(m_pid.calculate(m_vision.getVerticalOffset()) * m_max_angle_rate)
+          .withVelocityX(-m_controller.getLeftY() * m_max_speed)
+          .withVelocityY(-m_controller.getLeftX() * m_max_speed));
     }else{
         m_is_finished = true;
     }

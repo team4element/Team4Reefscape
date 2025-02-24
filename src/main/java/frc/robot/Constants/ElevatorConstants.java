@@ -17,7 +17,7 @@ public class ElevatorConstants {
     public static final double timeoutLevelFour = 2;
     public static final double timeoutCoralStation = 2;
 
-    public static final double manualSpeed = .3;
+    public static final double manualSpeed = .1;
 
     public static final double kP = 1.0;
     public static final double kI = 0.0;
