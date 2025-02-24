@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -46,7 +47,8 @@ public class LowerJaw extends UpperJaw {
         config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
         config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
         config.Feedback.SensorToMechanismRatio = 12;
-        config.Slot0.kP =  .2;
+        config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+        config.Slot0.kP =  .4;
         config.Slot0.kD = .001;
         config.Slot0.kV = .004;
         config.Slot0.kA = .004;
@@ -119,7 +121,7 @@ public void periodic() {
 
 private double positionToSetpoint(Level level){
     switch (level) {
-        case LEVEL_1: return 1;
+        case LEVEL_1: return .5;
         case LEVEL_2: return 0;
         case LEVEL_3: return 0;
         case LEVEL_4: return 0;
@@ -131,6 +133,7 @@ private double positionToSetpoint(Level level){
 
 public void jawOff(){
     m_jawPivot.set(0);
+    m_jawPivot.setNeutralMode(NeutralModeValue.Brake);
 }
 
 public Command c_goToSetPoint(Level position){
