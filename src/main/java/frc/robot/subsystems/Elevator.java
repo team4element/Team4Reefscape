@@ -145,4 +145,9 @@ public class Elevator extends SubsystemBase{
 
         return 3;
     }
+
+    public void resetEncoders(){
+        m_leftLeader.setPosition(0);
+        m_rightFollower.setPosition(0);
+    }
 }

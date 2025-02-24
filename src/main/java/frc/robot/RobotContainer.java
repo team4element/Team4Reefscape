@@ -113,4 +113,9 @@ public class RobotContainer {
 
     // }
 
+    public void onEnable(){
+        m_lowerJaw.resetPivotEncoder();
+        m_elevator.resetEncoders();
+    }
+
 }

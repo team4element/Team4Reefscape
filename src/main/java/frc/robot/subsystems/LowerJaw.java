@@ -46,10 +46,10 @@ public class LowerJaw extends UpperJaw {
         config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
         config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
         config.Feedback.SensorToMechanismRatio = 12;
-        config.Slot0.kP =  .01;
+        config.Slot0.kP =  .2;
         config.Slot0.kD = .001;
-        config.Slot0.kV = .005;
-        config.Slot0.kA = .005;
+        config.Slot0.kV = .004;
+        config.Slot0.kA = .004;
         
         m_innerBottom = new TalonFX(JawConstants.innerBottomId);
         m_outerBottom = new TalonFX(JawConstants.outerBottomId);
@@ -62,7 +62,6 @@ public class LowerJaw extends UpperJaw {
         m_topControlRequest = new DutyCycleOut(.5);
         
         TalonFXConfigurator innerConfigurator = m_innerBottom.getConfigurator();
-        TalonFXConfigurator pivotConfigurator = m_jawPivot.getConfigurator();
         //InnerBottom is going CCW or CW+
         currentConfigs.Inverted = InvertedValue.Clockwise_Positive;
         m_innerBottom.getConfigurator().apply(currentConfigs);
@@ -78,7 +77,6 @@ public class LowerJaw extends UpperJaw {
 
         //should seperate the config constants later to make it unique to each motor 
         innerConfigurator.apply(m_limitConfig);
-        pivotConfigurator.apply(m_limitConfig);
     }
     
     public void setLowerJaw(double speed){
@@ -95,7 +93,6 @@ public class LowerJaw extends UpperJaw {
     //Pivot to move the Coral intake
     public void Pivot(double speed){
         final double max_speed = .5;
-        // System.out.println(speed);
         m_jawPivot.setControl(m_topControlRequest.withOutput(speed * max_speed));
     }
 
@@ -117,12 +114,12 @@ public void goToSetPoint(double setPoint){
 public void periodic() {
     super.periodic();
 
-    System.out.printf("%s\rn", m_jawPivot.getRotorPosition().toString());
+    System.out.printf("%s\r\n", m_jawPivot.getRotorPosition().toString());
 }
 
 private double positionToSetpoint(Level level){
     switch (level) {
-        case LEVEL_1: return .5;
+        case LEVEL_1: return 1;
         case LEVEL_2: return 0;
         case LEVEL_3: return 0;
         case LEVEL_4: return 0;
@@ -138,6 +135,10 @@ public void jawOff(){
 
 public Command c_goToSetPoint(Level position){
     return startEnd(() -> goToSetPoint(positionToSetpoint(position)), () -> jawOff());
+}
+
+public void resetPivotEncoder(){
+    m_jawPivot.setPosition(0);
 }
 
 }
