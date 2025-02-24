@@ -11,11 +11,15 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.ApproachApriltag;
 import frc.robot.Commands.AutoMove;
+import frc.robot.Commands.AutomaticPivot;
 import frc.robot.Commands.HoldAngle;
 import frc.robot.Commands.Shift;
+import frc.robot.Commands.tempBottomMotor;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.JawConstants;
@@ -46,7 +50,6 @@ public class RobotContainer {
     public final LowerJaw m_lowerJaw = new LowerJaw();
     public final Elevator m_elevator = new Elevator();
   
-
     public RobotContainer() {
         configureBindings();
         ShuffleboardHelper.getInstance().initialize();
@@ -89,12 +92,14 @@ public class RobotContainer {
 
         //Operator Controls
         ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
-        ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(-JawConstants.intakeSpeed));
-        ControllerConstants.operatorController.rightTrigger().whileTrue(m_jaw.c_intakeAlgae(JawConstants.intakeSpeed));
-        ControllerConstants.operatorController.leftTrigger().whileTrue(m_jaw.c_intakeAlgae(-JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.outtakeSpeed));
+        //ControllerConstants.operatorController.rightTrigger().whileTrue(m_jaw.c_intakeAlgae(JawConstants.intakeSpeed));
+       // ControllerConstants.operatorController.leftTrigger().whileTrue(m_jaw.c_outtakeAlgae(JawConstants.outtakeAlgae));
+        //ControllerConstants.operatorController.leftTrigger().whileTrue(c_testingAlgaeOuttake());
+        ControllerConstants.operatorController.a().whileTrue(m_lowerJaw.c_automaticPivot());
 
         ControllerConstants.operatorController.povUp().whileTrue( m_elevator.c_moveElevator(ElevatorConstants.manualSpeed));
-        ControllerConstants.operatorController.povDown().whileTrue( m_elevator.c_moveElevator(-ElevatorConstants.manualSpeed));
+        ControllerConstants.operatorController.povDown().whileTrue( m_elevator.c_moveElevator(-0.4));
 
         //ControllerConstants.operatorController.a().onTrue(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint));
     }
@@ -103,6 +108,15 @@ public class RobotContainer {
         return Commands.print("No autonomous command configured");
     }
 
+      public SequentialCommandGroup c_testingAlgaeOuttake(){
+    return new SequentialCommandGroup( 
+      new tempBottomMotor(m_lowerJaw, m_jaw).withTimeout(2), new AutomaticPivot(m_lowerJaw));
+      }
+      
+  }
+    // private ParallelCommandGroup scoreAlgae(){
+    //     return new ParallelCommandGroup(m_jaw.c_outtakeAlgae(JawConstants.outtakeAlgae), m_lowerJaw.c_pivotManual().withTimeout(3));
+    // }
 
     // private SequentialCommandGroup LevelOne(double rpmTop, double rpmBot, double timeout, double elevatorSpeed, double armAngle) {
     // return new SequentialCommandGroup(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint),
@@ -111,4 +125,3 @@ public class RobotContainer {
     
     // }
 
-}

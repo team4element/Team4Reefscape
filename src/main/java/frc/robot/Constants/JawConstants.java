@@ -8,8 +8,10 @@ public class JawConstants {
     public static final int outerBottomId = 15;
     public static final int jawPivotId = 16;
 
-    public static final double limitForward = 1;
-    public static final double limitBackwards = -1;
+    public static final double limitForward = -7.5;
+    public static final double limitBackwards = 7;
+
+    public static final double pivotTolerance = 0.4;
 
     public static final double statorLimit = 80;
     public static final double supplyLimit = 80;
@@ -17,11 +19,13 @@ public class JawConstants {
     public static final double lowerStatorLimit = 80;
     public static final double lowerSupplyLimit = 80;
 
-    public static final double intakeSpeed = .5;
+    public static final double intakeSpeed = .1;
+    public static final double outtakeSpeed = -.4;
+    public static final double outtakeAlgae = -0.3;
 
     public static final double rampUpTime = .8; //Ramp up time for future shooting of the algae to the net
 
-    public static final double kP = 0.0;
+    public static final double kP = 0.05;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
 

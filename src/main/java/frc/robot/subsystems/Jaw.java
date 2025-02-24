@@ -13,6 +13,8 @@ import com.ctre.phoenix6.controls.Follower;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.JawConstants;
 
@@ -84,12 +86,27 @@ public class Jaw extends SubsystemBase {
     }
 
 
-    public void setJaw(double speed){
+    public void setJawIntake(double speed){
         m_outerBottom.setControl(m_outerControlRequest.withOutput(-speed));
         m_innerBottom.setControl(m_innerControlRequest.withOutput(speed));
         m_top.setControl(m_topControlRequest.withOutput(speed));
     }
-  
+
+    public void setJawOuttake(double speed){
+      m_outerBottom.setControl(m_outerControlRequest.withOutput(1));
+      m_innerBottom.setControl(m_innerControlRequest.withOutput(-.25));
+      m_top.setControl(m_topControlRequest.withOutput(-.25));
+  }
+
+  public Command c_topMotor(double speed){
+    return startEnd(() -> m_top.setControl(m_topControlRequest.withOutput(speed)), () ->  m_top.set(0));
+  }
+
+  public void topJawTest(double speed){
+    m_top.setControl(m_topControlRequest.withOutput(speed));
+  }
+
+  //back bottom and top need to go backwards for 2 seconds at 0.25. The front is max forward and after those 2 seconds, the other two motors also go forward
  
     public void motorsOff(){
         m_outerBottom.set(0);
@@ -112,7 +129,11 @@ public class Jaw extends SubsystemBase {
     
      //Algae Intake
  public Command c_intakeAlgae(double speed){
-    return startEnd(() -> setJaw(speed), () -> motorsOff());   
+    return startEnd(() -> setJawIntake(speed), () -> motorsOff());  
+}
+
+public Command c_outtakeAlgae(double speed){
+  return startEnd(() -> setJawOuttake(speed), () -> motorsOff());  
 }
 
   public void periodic(){

@@ -86,7 +86,6 @@ public class Elevator extends SubsystemBase{
         SmartDashboard.putNumber(ElevatorConstants.tableD, ElevatorConstants.kD);
     }
 
-
     public void setMotors(double speed) {
         m_leftLeader.setControl(m_leftDutyCycle.withOutput(speed));
      }
@@ -95,7 +94,6 @@ public class Elevator extends SubsystemBase{
         motor.set(0);
         motor.setNeutralMode(NeutralModeValue.Brake);
     }
-
 
     public void goToSetPoint(double setPoint){
         target = setPoint;
@@ -124,7 +122,6 @@ public class Elevator extends SubsystemBase{
     public void periodic() {
         // TODO Auto-generated method stub
         super.periodic();
-
         setPID();
     }
 
