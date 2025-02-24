@@ -14,10 +14,12 @@ public class ShuffleboardHelper {
 
     private GenericEntry m_turn_threshold;
     private GenericEntry m_horizontal_threshold;
+    private GenericEntry m_vertical_threshold;
 
     public void initialize() {
         m_turn_threshold = Shuffleboard.getTab("Vision").add("Turn Threshold", 5.).getEntry();
-        m_horizontal_threshold = Shuffleboard.getTab("Vision").add("Horizontal Threshold", 5).getEntry();;
+        m_horizontal_threshold = Shuffleboard.getTab("Vision").add("Horizontal Threshold", 5).getEntry();
+        m_vertical_threshold = Shuffleboard.getTab("Vision").add("Vertical Threshold", 5).getEntry();
     }
 
     public double getTurnThreshold() {
@@ -26,5 +28,9 @@ public class ShuffleboardHelper {
 
     public double getHorizontalThreshold() {
         return m_horizontal_threshold.getDouble(5.);
+    }
+
+    public double getVerticalThreshold() {
+        return m_vertical_threshold.getDouble(5.);
     }
 }

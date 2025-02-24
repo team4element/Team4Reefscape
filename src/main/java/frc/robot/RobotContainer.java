@@ -10,17 +10,25 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Commands.ApproachApriltag;
 import frc.robot.Commands.AutoMove;
+import frc.robot.Commands.HoldAngle;
+import frc.robot.Commands.Shift;
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.JawConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Jaw;
 import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.LowerJaw;
+import frc.robot.subsystems.Elevator.Level;
 
 public class RobotContainer {
 
@@ -31,7 +39,7 @@ public class RobotContainer {
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDeadband(MaxSpeed * 0.3).withRotationalDeadband(MaxAngularRate * 0.3) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -39,7 +47,11 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    public final Vision vision = new Vision();
+    public final Vision m_vision = new Vision();
+    public final Jaw m_jaw = new Jaw();
+    public final LowerJaw m_lowerJaw = new LowerJaw();
+    public final Elevator m_elevator = new Elevator();
+  
 
     public RobotContainer() {
         // creates a menu on shuffle board for autons
@@ -62,25 +74,49 @@ public class RobotContainer {
             )
         );
 
-        ControllerConstants.driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        ControllerConstants.driverController.x().onTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.TURN_IN_PLACE));
-        ControllerConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-ControllerConstants.driverController.getLeftY(), -ControllerConstants.driverController.getLeftX()))
-        ));
+        m_lowerJaw.setDefaultCommand(m_lowerJaw.c_pivotManual());
 
+        ControllerConstants.driverController.a().whileTrue(new AutoMove(drivetrain, m_vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_VERTICAL));
+        ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed, MaxAngularRate));
+        //ControllerConstants.driverController.b().whileTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_HORIZONTAL));
+        ControllerConstants.driverController.b().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed));
+        // ControllerConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-ControllerConstants.driverController.getLeftY(), -ControllerConstants.driverController.getLeftX()))
+        // ));
+        ControllerConstants.driverController.y().whileTrue(new ApproachApriltag(drivetrain, m_vision, 13, 3.0));
         // Run SysId routines when holding back/start and X/Y.
+
         // Note that each routine should be run exactly once in a single log.
-        ControllerConstants.driverController.back().and(ControllerConstants.driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        ControllerConstants.driverController.back().and(ControllerConstants.driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        ControllerConstants.driverController.start().and(ControllerConstants.driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        ControllerConstants.driverController.start().and(ControllerConstants.driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+
+	//Driver Controls
         // reset the field-centric heading on left bumper press
         ControllerConstants.driverController.leftBumper().whileTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
         drivetrain.registerTelemetry(logger::telemeterize);
+
+        //Operator Controls
+        ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.outtakeSpeed));
+        ControllerConstants.operatorController.rightTrigger().whileTrue(m_jaw.c_intakeAlgae(JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftTrigger().whileTrue(m_jaw.c_intakeAlgae(-JawConstants.intakeSpeed));
+
+        ControllerConstants.operatorController.povUp().whileTrue( m_elevator.c_moveElevator(ElevatorConstants.manualSpeed));
+        ControllerConstants.operatorController.povDown().whileTrue( m_elevator.c_moveElevator(-ElevatorConstants.manualSpeed));
+        ControllerConstants.operatorController.a().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_1));
+        ControllerConstants.operatorController.b().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_2));
+        ControllerConstants.operatorController.y().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_3));
+        ControllerConstants.operatorController.x().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_4));
+        ControllerConstants.operatorController.start().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.CORAL_STATION));
+        
+        ControllerConstants.operatorController.back().whileTrue(m_elevator.c_zeroEncoder());
+
+        //ControllerConstants.operatorController.a().onTrue(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint));
     }
 
     public Command getAutonomousCommand() {
         return sendableAuton.getSelected();
+    }
+
+    public void onEnable(){
+        m_elevator.zeroPosition();
     }
 }

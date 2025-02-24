@@ -4,10 +4,14 @@
 
 package frc.robot.Commands;
 
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -22,6 +26,7 @@ public class AutoMove extends Command {
   private SwerveRequest.FieldCentric m_drive;
   private double m_threshold;
   private boolean m_is_finished;
+  private PIDController m_pid;
 
   public AutoMove(CommandSwerveDrivetrain drive_train, Vision vision, CommandSwerveDrivetrain.AutoMoveAction action) {
     m_drive_train = drive_train;
@@ -29,9 +34,15 @@ public class AutoMove extends Command {
     m_rotation_speed = m_horizontal_speed = m_vertical_speed = 0;
     m_threshold = 0;
     m_action = action;
-    
-    m_drive = new SwerveRequest.FieldCentric();
-  
+
+    m_pid = new PIDController(VisionConstants.AutoMove_P, VisionConstants.AutoMove_I, VisionConstants.AutoMove_D);
+
+    m_drive = new SwerveRequest.FieldCentric()
+      .withDeadband(VisionConstants.deadband)
+      .withRotationalDeadband(VisionConstants.rotationalDeadband)
+      .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
+      .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo);
+
     addRequirements(drive_train, vision);
   }
 
@@ -40,17 +51,22 @@ public class AutoMove extends Command {
   public void initialize() {
     m_is_finished = false;
       switch (m_action) {
-        case TURN_IN_PLACE: 
-          m_rotation_speed = .5;
+        case TURN_IN_PLACE:
+          m_rotation_speed = VisionConstants.turningSpeed;
           m_vision.switchPipeline(Vision.Pipeline.TWO_DIMENSIONAL);
-          // m_threshold = ShuffleboardHelper.getInstance().getTurnThreshold();
-          m_threshold = 5;
+          m_threshold = ShuffleboardHelper.getInstance().getTurnThreshold();
+          m_threshold = .5;
           break;
-        case MOVE_HORIZONTAL: 
-          m_horizontal_speed = .5;
+        case MOVE_HORIZONTAL:
+          m_vision.switchPipeline(Vision.Pipeline.THREE_DIMENSIONAL);
+          m_horizontal_speed = VisionConstants.horizontalSpeed;
+          m_threshold = ShuffleboardHelper.getInstance().getHorizontalThreshold();
+          m_threshold = 1.0;
           break;
-        case MOVE_VERTICAL: 
-          m_vertical_speed = .5;
+        case MOVE_VERTICAL:
+          m_vision.switchPipeline(Vision.Pipeline.THREE_DIMENSIONAL);
+          m_vertical_speed = VisionConstants.verticalSpeed;
+          m_threshold = 2.0;
           break;
         default: break;
       }
@@ -63,9 +79,11 @@ public class AutoMove extends Command {
     double offset = 0;
 
     switch (m_action) {
-      case MOVE_HORIZONTAL: //fallthrough
+      case MOVE_HORIZONTAL: offset = m_vision.getVerticalOffset(); break; //fallthrough
       case TURN_IN_PLACE: offset = m_vision.getHorizontalOffset(); break;
-      case MOVE_VERTICAL: offset = m_vision.getVerticalOffset(); break;
+      case MOVE_VERTICAL: offset = m_vision.getTarget3DPose().getZ();
+        // System.out.printf("\r\n X: %f, Y: %f, Z: %f", m_vision.getTarget3DPose().getX(), m_vision.getTarget3DPose().getY(), m_vision.getTarget3DPose().getZ());
+      break;
       default: break;
     }
 
@@ -75,13 +93,13 @@ public class AutoMove extends Command {
       if (offset < -m_threshold) {
         m_drive_train.setControl(
             m_drive
-              .withRotationalRate(m_rotation_speed)
+              .withRotationalRate(m_pid.calculate(m_vision.getHorizontalOffset()) * m_rotation_speed)
               .withVelocityX(m_vertical_speed)
               .withVelocityY(m_horizontal_speed));
       } else if (offset > m_threshold) {
         m_drive_train.setControl(
           m_drive
-          .withRotationalRate(-m_rotation_speed)
+          .withRotationalRate(m_pid.calculate(m_vision.getHorizontalOffset()) * m_rotation_speed)
           .withVelocityX(-m_vertical_speed)
           .withVelocityY(-m_horizontal_speed));
       }else{
@@ -95,7 +113,7 @@ public class AutoMove extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-
+      
   }
 
   // Returns true when the command should end.
