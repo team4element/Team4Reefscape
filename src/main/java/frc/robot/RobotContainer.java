@@ -27,6 +27,7 @@ import frc.robot.subsystems.UpperJaw;
 import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.LowerJaw;
+import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Elevator.Level;
 
 public class RobotContainer {
@@ -47,6 +48,7 @@ public class RobotContainer {
     public final UpperJaw m_upperJaw = new UpperJaw();
     public final LowerJaw m_lowerJaw = new LowerJaw();
     public final Elevator m_elevator = new Elevator();
+    public final Pivot    m_pivot    = new Pivot();
 
     public RobotContainer() {
         configureBindings();
@@ -59,13 +61,14 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-ControllerConstants.driverController.getLeftY() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive forward with negative Y (forward)
-                    .withVelocityY(-ControllerConstants.driverController.getLeftX() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive left with negative X (left)
+                drive.withVelocityX(ControllerConstants.driverController.getLeftY() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive forward with negative Y (forward)
+                    .withVelocityY(ControllerConstants.driverController.getLeftX() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive left with negative X (left)
                     .withRotationalRate(-ControllerConstants.driverController.getRightX() * MaxAngularRate * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive counterclockwise with negative X (left)
             )
         );
 
-        m_lowerJaw.setDefaultCommand(m_lowerJaw.c_pivotManual());
+        m_pivot.setDefaultCommand(m_pivot.c_pivotManual());
+        m_elevator.setDefaultCommand(m_elevator.c_hold());
 
         ControllerConstants.driverController.a().whileTrue(new AutoMove(drivetrain, m_vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_VERTICAL));
         ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed, MaxAngularRate));
@@ -100,7 +103,7 @@ public class RobotContainer {
         ControllerConstants.operatorController.y().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_3));
         ControllerConstants.operatorController.x().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_4));
         ControllerConstants.operatorController.start().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.CORAL_STATION));
-        ControllerConstants.operatorController.back().whileTrue(m_lowerJaw.c_goToSetPoint(Elevator.Level.LEVEL_1));
+        ControllerConstants.operatorController.back().whileTrue(m_pivot.c_goToSetPoint(Elevator.Level.LEVEL_1));
 
         //ControllerConstants.operatorController.a().onTrue(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint));
     }
@@ -122,7 +125,7 @@ public class RobotContainer {
     // }
 
     public void onEnable(){
-        m_lowerJaw.resetPivotEncoder();
+        m_pivot.resetPivotEncoder();
         m_elevator.resetEncoders();
     }
 
