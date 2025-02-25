@@ -49,6 +49,10 @@ public class RobotContainer {
     public final Elevator m_elevator = new Elevator();
 
     public RobotContainer() {
+        // creates a menu on shuffle board for autons and communicates to the robot
+        sendableAuton = AutoBuilder.buildAutoChooser();
+      //  SmartDashboard.putData("Auto Chooser", sendableAuton);
+
         configureBindings();
         ShuffleboardHelper.getInstance().initialize();
     }
@@ -105,7 +109,13 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+
+        return  Commands.print("No autonomous command configured");
+        //return sendableAuton.getSelected();
+    }
+
+    public Command c_fieldRelative(){
+        return drivetrain.applyRequest(() -> drive);
     }
     // private SequentialCommandGroup LevelOne(double rpmTop, double rpmBot, double timeout, double elevatorSpeed, double armAngle) {
     // return new SequentialCommandGroup(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint),
