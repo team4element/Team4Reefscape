@@ -49,10 +49,6 @@ public class RobotContainer {
     public final Elevator m_elevator = new Elevator();
 
     public RobotContainer() {
-        // creates a menu on shuffle board for autons and communicates to the robot
-        sendableAuton = AutoBuilder.buildAutoChooser();
-      //  SmartDashboard.putData("Auto Chooser", sendableAuton);
-
         configureBindings();
         ShuffleboardHelper.getInstance().initialize();
     }
@@ -79,6 +75,7 @@ public class RobotContainer {
         //     point.withModuleDirection(new Rotation2d(-ControllerConstants.driverController.getLeftY(), -ControllerConstants.driverController.getLeftX()))
         // ));
         ControllerConstants.driverController.y().whileTrue(new ApproachApriltag(drivetrain, m_vision, 13, 3.0));
+        ControllerConstants.driverController.leftBumper().onTrue(drivetrain.c_seedFieldRelative());
         // Run SysId routines when holding back/start and X/Y.
 
         // Note that each routine should be run exactly once in a single log.

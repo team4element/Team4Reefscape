@@ -226,6 +226,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    public Command c_seedFieldRelative() {
+        return runOnce(() -> seedFieldCentric());
+    }
+
     @Override
     public void periodic() {
         /*
@@ -271,7 +275,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             case FAST     : return .75;
             case VERY_FAST: return 1;
         }
-
         return 1;
     }
 
