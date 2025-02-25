@@ -32,10 +32,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         MOVE_HORIZONTAL,
         MOVE_VERTICAL
     };
+
+    public enum SPEED {
+        SLOW,
+        FAST,
+        VERY_FAST
+    };
     
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
+    public SPEED m_speed = SPEED.VERY_FAST;
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -256,5 +263,30 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             updateSimState(deltaTime, RobotController.getBatteryVoltage());
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
+    }
+
+    public double speedToDouble(SPEED speed){
+        switch (speed) {
+            case SLOW     : return .5;
+            case FAST     : return .75;
+            case VERY_FAST: return 1;
+        }
+
+        return 1;
+    }
+
+    public void setSpeed(int speed){
+        if(m_speed.ordinal() + speed > SPEED.VERY_FAST.ordinal()){
+            m_speed = SPEED.SLOW;
+        }else if (m_speed.ordinal() + speed < SPEED.SLOW.ordinal()){
+            m_speed = SPEED.VERY_FAST;
+        }else{
+            m_speed = SPEED.values()[m_speed.ordinal() + speed];
+        }
+        System.out.printf("Updated Speed: %d\r\n", m_speed.ordinal());
+    }
+
+    public Command c_updateSpeed(int level){
+        return runOnce(() -> setSpeed(level));
     }
 }
