@@ -122,10 +122,10 @@ public void periodic() {
 private double positionToSetpoint(Level level){
     switch (level) {
         case LEVEL_1: return .5;
-        case LEVEL_2: return 0;
-        case LEVEL_3: return 0;
+        case LEVEL_2: return -3.5; //Estimate have to test
+        case LEVEL_3: return -3.5; //Estimate have to test
         case LEVEL_4: return 0;
-        case CORAL_STATION: return 0;
+        case CORAL_STATION: return -7.45;
     }
 
     return 0;
