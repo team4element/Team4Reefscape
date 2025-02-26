@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -26,6 +27,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.TunerConstants.TunerSwerveDrivetrain;
 
@@ -39,10 +41,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         MOVE_HORIZONTAL,
         MOVE_VERTICAL
     };
+
+    public enum SPEED {
+        SLOW,
+        FAST,
+        VERY_FAST
+    };
     
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
+    public SPEED m_speed = SPEED.VERY_FAST;
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -59,6 +68,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
+
+    public final SwerveRequest.FieldCentricFacingAngle fieldCentricFacingAngle = new SwerveRequest.FieldCentricFacingAngle()
+    .withDeadband(.5)
+    .withRotationalDeadband(.5)
+    .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
@@ -275,6 +289,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    public Command c_seedFieldRelative() {
+        return runOnce(() -> seedFieldCentric());
+    }
+
     @Override
     public void periodic() {
         /*
@@ -312,5 +330,37 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             updateSimState(deltaTime, RobotController.getBatteryVoltage());
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
+    }
+
+    public double speedToDouble(SPEED speed){
+        switch (speed) {
+            case SLOW     : return .5;
+            case FAST     : return .75;
+            case VERY_FAST: return 1;
+        }
+        return 1;
+    }
+
+    public void setSpeed(int speed){
+        if(m_speed.ordinal() + speed > SPEED.VERY_FAST.ordinal()){
+            m_speed = SPEED.SLOW;
+        }else if (m_speed.ordinal() + speed < SPEED.SLOW.ordinal()){
+            m_speed = SPEED.VERY_FAST;
+        }else{
+            m_speed = SPEED.values()[m_speed.ordinal() + speed];
+        }
+        System.out.printf("Updated Speed: %d\r\n", m_speed.ordinal());
+    }
+
+    public Command c_updateSpeed(int level){
+        return runOnce(() -> setSpeed(level));
+    }
+
+     public Command c_cardinalLock(double angle) {
+        return applyRequest( // could be better to change whileTrue to onTrue or toggleOnTrue
+                () -> fieldCentricFacingAngle
+                        .withVelocityX((-ControllerConstants.driverController.getLeftY()) * .3)
+                        .withVelocityY((-ControllerConstants.driverController.getLeftX()) * .3)
+                        .withTargetDirection(Rotation2d.fromDegrees(angle)));
     }
 }

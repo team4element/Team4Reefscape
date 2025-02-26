@@ -12,13 +12,13 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
 
 public class Elevator extends SubsystemBase{
+    public double m_hold_value = 0; 
     TalonFX m_rightFollower;
     TalonFX m_leftLeader;
 
@@ -88,8 +88,6 @@ public class Elevator extends SubsystemBase{
         SmartDashboard.putNumber(ElevatorConstants.tableP, ElevatorConstants.kP);
         SmartDashboard.putNumber(ElevatorConstants.tableI, ElevatorConstants.kI);
         SmartDashboard.putNumber(ElevatorConstants.tableD, ElevatorConstants.kD);
-
-        zeroPosition();
     }
 
 
@@ -100,11 +98,16 @@ public class Elevator extends SubsystemBase{
      public void motorOff(TalonFX motor){
         motor.set(0);
         motor.setNeutralMode(NeutralModeValue.Brake);
+        m_hold_value = m_leftLeader.getPosition().getValueAsDouble();
     }
 
+    public void holdEnd(){
+        m_leftLeader.set(0);
+        m_leftLeader.setNeutralMode(NeutralModeValue.Brake);
+    }
 
     public void goToSetPoint(double setPoint){
-        System.out.println(setPoint);
+        System.out.printf("setpoint: %f", setPoint);
         m_leftLeader.setControl(m_request.withPosition(setPoint));
     }
 
@@ -114,7 +117,7 @@ public class Elevator extends SubsystemBase{
 
     public double getCurrentPosition() {
         return m_leftLeader.getPosition().getValueAsDouble();
-      }
+    }
 
       public void setPID(){
 
@@ -129,16 +132,10 @@ public class Elevator extends SubsystemBase{
         return startEnd(() -> setMotors(speed), () -> motorOff(m_leftLeader));
     }
 
-    public Command c_zeroEncoder(){
-       return run(() -> zeroPosition());
-    }
-
     @Override
     public void periodic() {
         // TODO Auto-generated method stub
         super.periodic();
-
-        System.out.printf("%s | %s", m_leftLeader.getRotorPosition().toString(), m_rightFollower.getRotorPosition());
 
         setPID();
     }
@@ -149,15 +146,18 @@ public class Elevator extends SubsystemBase{
             case LEVEL_2: return 3.6;
             case LEVEL_3: return 5.6;
             case LEVEL_4: return 7.3;
-            case CORAL_STATION: return 4.0;
+            case CORAL_STATION: return 3.2;
         }
 
         return 3;
     }
 
-    public void zeroPosition(){
+    public void resetEncoders(){
         m_leftLeader.setPosition(0);
         m_rightFollower.setPosition(0);
     }
 
+    public Command c_hold(){
+        return startEnd(()-> goToSetPoint(m_hold_value), () -> holdEnd());
+    }
 }

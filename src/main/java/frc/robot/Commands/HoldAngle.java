@@ -41,7 +41,7 @@ public class HoldAngle extends Command {
     m_pid = new PIDController(VisionConstants.HoldAngle_P, VisionConstants.HoldAngle_I, VisionConstants.HoldAngle_D); //TODO better tune
 
     m_drive = new SwerveRequest.FieldCentric()
-      .withDeadband(VisionConstants.deadband)
+      .withDeadband(m_max_speed * VisionConstants.deadband)
       .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
       .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo);
 
@@ -61,7 +61,7 @@ public class HoldAngle extends Command {
   public void execute() {
     double offset = 0;
 
-    System.out.printf("\r\n threshold %f | offset: %f", m_threshold, offset);
+    // System.out.printf("\r\n threshold %f | offset: %f", m_threshold, offset);
 
     //testing horizontal movement (in progress and might change back to angular movement)
     if (m_vision.hasTarget()) {
@@ -70,6 +70,8 @@ public class HoldAngle extends Command {
           .withRotationalRate(m_pid.calculate(m_vision.getVerticalOffset()) * m_max_angle_rate)
           .withVelocityX(-m_controller.getLeftY() * m_max_speed)
           .withVelocityY(-m_controller.getLeftX() * m_max_speed));
+        // System.out.printf("vr: %f  vX: %f  vY: %f\n", m_pid.calculate(m_vision.getVerticalOffset()) * m_max_angle_rate, -m_controller.getLeftY() * m_max_speed, -m_controller.getLeftX() * m_max_speed);
+        // System.out.printf("cX: %f  cY: %f\n", m_controller.getLeftX(), m_controller.getLeftY());
     }else{
         m_is_finished = true;
     }
