@@ -34,15 +34,15 @@ public class Pivot extends SubsystemBase {
       m_duty_cycle = new DutyCycleOut(.8);
       m_request = new PositionVoltage(0);
 
-      m_jawPivot.getConfigurator().apply(config);
       config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
       config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
-      config.Feedback.SensorToMechanismRatio = 12;
+      // config.Feedback.SensorToMechanismRatio = 12;
       config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-      config.Slot0.kP =  .4;
-      config.Slot0.kD = .001;
+      config.Slot0.kP =  .5;
+      // config.Slot0.kD = .001;
       config.Slot0.kV = .004;
-      config.Slot0.kA = .004;
+      // config.Slot0.kA = .004;
+      m_jawPivot.getConfigurator().apply(config);
   }
 
   @Override
@@ -57,12 +57,12 @@ public class Pivot extends SubsystemBase {
 
       //Pivot to move the Coral intake
   public void manualPivot(double speed){
-      final double max_speed = .5;
+      final double max_speed = .3;
       m_jawPivot.setControl(m_duty_cycle.withOutput(speed * max_speed));
   }
 
   public Command c_pivotManual(){
-    return Commands.run(() -> manualPivot(ControllerConstants.operatorController.getLeftY() * .3), this);
+    return Commands.run(() -> manualPivot(ControllerConstants.operatorController.getLeftY()), this);
   }
 
   public void goToSetPoint(double setPoint){
@@ -84,11 +84,14 @@ public class Pivot extends SubsystemBase {
 
   private double positionToSetpoint(Level level){
     switch (level) {
-        case LEVEL_1: return .5;
+        case LEVEL_1: return 0;
         case LEVEL_2: return -3.5; //Estimate have to test
         case LEVEL_3: return -3.5; //Estimate have to test
         case LEVEL_4: return 0;
-        case CORAL_STATION: return -7.45;
+        case CORAL_STATION: return .2;
+
+        //-.4 max
+        //.2 max
     }
 
     return 0;

@@ -11,12 +11,14 @@ import frc.robot.subsystems.UpperJaw;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class IntakeAlgae extends Command {
   /** Creates a new IntakeAlgae. */
-  double m_speed;
+  double m_lower_speed;
+  double m_upper_speed;
   UpperJaw m_upperJaw;
   LowerJaw m_lowerJaw;
 
-  public IntakeAlgae(UpperJaw upperJaw, LowerJaw lowerJaw, double speed) {
-    m_speed = speed;
+  public IntakeAlgae(UpperJaw upperJaw, LowerJaw lowerJaw, double upper_speed, double lower_speed) {
+    m_upper_speed = upper_speed;
+    m_lower_speed = lower_speed;
     m_upperJaw = upperJaw;
     m_lowerJaw = lowerJaw;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -30,8 +32,8 @@ public class IntakeAlgae extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_upperJaw.setJaw(m_speed);
-    m_lowerJaw.setLowerJaw(-m_speed, m_speed);
+    m_upperJaw.setJaw(m_upper_speed);
+    m_lowerJaw.setLowerJaw(-m_lower_speed, m_lower_speed);
   }
 
   // Called once the command ends or is interrupted.
