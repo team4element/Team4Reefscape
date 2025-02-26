@@ -31,7 +31,7 @@ public class IntakeAlgae extends Command {
   @Override
   public void execute() {
     m_upperJaw.setJaw(m_speed);
-    m_lowerJaw.setLowerJaw(m_speed);
+    m_lowerJaw.setLowerJaw(-m_speed, m_speed);
   }
 
   // Called once the command ends or is interrupted.

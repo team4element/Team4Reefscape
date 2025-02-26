@@ -7,10 +7,10 @@ package frc.robot.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.Level;
-import frc.robot.subsystems.LowerJaw;
+import frc.robot.subsystems.Pivot;
 
 public class ElevateAndJaw extends ParallelCommandGroup {
-  public ElevateAndJaw(Elevator elevator, LowerJaw lowerJaw, Level elevatorLevel) {
-    addCommands(elevator.c_goToSetPoint(elevatorLevel), lowerJaw.c_goToSetPoint(elevatorLevel));
+  public ElevateAndJaw(Elevator elevator, Pivot pivot, Level elevatorLevel) {
+    addCommands(elevator.c_goToSetPoint(elevatorLevel), pivot.c_goToSetPoint(elevatorLevel));
   }
 }

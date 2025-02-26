@@ -21,7 +21,6 @@ public class LowerJaw extends UpperJaw {
     private TalonFX m_innerBottom;
     private TalonFX m_outerBottom;
    
-    private TalonFX m_jawPivot;
     private PositionVoltage m_request;
 
     private DutyCycleOut m_outerControlRequest;
@@ -41,23 +40,10 @@ public class LowerJaw extends UpperJaw {
 
     public LowerJaw(){
         m_request = new PositionVoltage(0).withSlot(0);
-        
-        TalonFXConfiguration config = new TalonFXConfiguration();
-        config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
-        config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
-        config.Feedback.SensorToMechanismRatio = 12;
-        config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-        config.Slot0.kP =  .4;
-        config.Slot0.kD = .001;
-        config.Slot0.kV = .004;
-        config.Slot0.kA = .004;
-        
+                
         m_innerBottom = new TalonFX(JawConstants.innerBottomId);
         m_outerBottom = new TalonFX(JawConstants.outerBottomId);
         
-        m_jawPivot = new TalonFX(JawConstants.jawPivotId);
-        m_jawPivot.getConfigurator().apply(config);
-
         m_outerControlRequest = new DutyCycleOut(.5);
         m_innerControlRequest = new DutyCycleOut(.5);
         m_topControlRequest = new DutyCycleOut(.5);
@@ -80,67 +66,29 @@ public class LowerJaw extends UpperJaw {
         innerConfigurator.apply(m_limitConfig);
     }
     
-    public void setLowerJaw(double speed){
-        m_outerBottom.setControl(m_outerControlRequest.withOutput(speed));
-        m_innerBottom.setControl(m_outerControlRequest.withOutput(speed));
+    public void setLowerJaw(double outer_speed, double inner_speed){
+        m_outerBottom.setControl(m_outerControlRequest.withOutput(outer_speed));
+        m_innerBottom.setControl(m_outerControlRequest.withOutput(inner_speed));
     }
 
     public void motorsOff(){
         m_innerBottom.set(0);
         m_outerBottom.set(0);
-        m_jawPivot.setNeutralMode(NeutralModeValue.Brake);     
-    }
-
-    //Pivot to move the Coral intake
-    public void Pivot(double speed){
-        final double max_speed = .5;
-        m_jawPivot.setControl(m_topControlRequest.withOutput(speed * max_speed));
+        m_innerBottom.setNeutralMode(NeutralModeValue.Brake);
+        m_outerBottom.setNeutralMode(NeutralModeValue.Brake); 
     }
 
   //Commands
   //Assigns a part of the controller to move the pivot
-  public Command c_pivotManual(){
-    return Commands.run(() -> Pivot(ControllerConstants.operatorController.getLeftY() * .3), this);
-}
+
 
  public Command c_intakeCoral(double speed){
-    return startEnd(() -> setLowerJaw(speed), () -> motorsOff());   
-}
-
-public void goToSetPoint(double setPoint){
-    m_jawPivot.setControl(m_request.withPosition(setPoint));
+    return startEnd(() -> setLowerJaw(speed, speed), () -> motorsOff());   
 }
     
 @Override
 public void periodic() {
     super.periodic();
-
-    System.out.printf("%s\r\n", m_jawPivot.getRotorPosition().toString());
-}
-
-private double positionToSetpoint(Level level){
-    switch (level) {
-        case LEVEL_1: return .5;
-        case LEVEL_2: return -3.5; //Estimate have to test
-        case LEVEL_3: return -3.5; //Estimate have to test
-        case LEVEL_4: return 0;
-        case CORAL_STATION: return -7.45;
-    }
-
-    return 0;
-}
-
-public void jawOff(){
-    m_jawPivot.set(0);
-    m_jawPivot.setNeutralMode(NeutralModeValue.Brake);
-}
-
-public Command c_goToSetPoint(Level position){
-    return startEnd(() -> goToSetPoint(positionToSetpoint(position)), () -> jawOff());
-}
-
-public void resetPivotEncoder(){
-    m_jawPivot.setPosition(0);
 }
 
 }
