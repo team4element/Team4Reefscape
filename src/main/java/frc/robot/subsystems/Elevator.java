@@ -1,13 +1,11 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -18,22 +16,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
 
 public class Elevator extends SubsystemBase{
-    public double m_hold_value = 0; 
-    TalonFX m_rightFollower;
-    TalonFX m_leftLeader;
-
-    public MotorOutputConfigs currentConfigs = new MotorOutputConfigs();
-
+    private TalonFX m_rightFollower;
+    private TalonFX m_leftLeader;
     private DutyCycleOut m_leftDutyCycle;
-
-    double target = 0;
-
-    PositionVoltage m_request;
-    final VelocityVoltage m_requestLeft;
-    final VelocityVoltage m_requestRight;
-
-    CurrentLimitsConfigs m_limitConfig = new CurrentLimitsConfigs();
-
+    private PositionVoltage m_request;
+    private TalonFXConfiguration config;
+    private CurrentLimitsConfigs m_limitConfig;
+    private TalonFXConfigurator m_leftConfigurator;
+    private TalonFXConfigurator m_rightConfigurator;
+    private double m_hold_value; 
+    
     //The different levels the elevator needs a setpoint for
     public static enum Level{
         LEVEL_1,
@@ -44,7 +36,9 @@ public class Elevator extends SubsystemBase{
     }
 
     public Elevator(){
-        TalonFXConfiguration config = new TalonFXConfiguration();
+        m_hold_value = 0;
+
+        config = new TalonFXConfiguration();
         config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
         config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
         config.Feedback.SensorToMechanismRatio = 9;
@@ -52,19 +46,21 @@ public class Elevator extends SubsystemBase{
         config.Slot0.kD = .1;
         config.Slot0.kV = .005;
         config.Slot0.kA = .005;
+        config.Slot1.kP =  3;
+        config.Slot1.kD = .1;
+        config.Slot1.kV = .005;
+        config.Slot1.kA = .005;
 
         m_rightFollower = new TalonFX(ElevatorConstants.rightFollowerId);
         m_leftLeader = new TalonFX(ElevatorConstants.leftLeaderId);
 
-        m_request = new PositionVoltage(target).withSlot(0);
-
-        m_requestLeft = new VelocityVoltage(0).withSlot(0);
-        m_requestRight = new VelocityVoltage(0).withSlot(0);
+        m_request = new PositionVoltage(0).withSlot(0);
+        m_limitConfig = new CurrentLimitsConfigs();
 
         m_leftDutyCycle = new DutyCycleOut(1);
 
-        TalonFXConfigurator leftConfigurator = m_leftLeader.getConfigurator();
-        TalonFXConfigurator rightConfigurator = m_rightFollower.getConfigurator();
+        m_leftConfigurator  = m_leftLeader.getConfigurator();
+        m_rightConfigurator = m_rightFollower.getConfigurator();
 
         m_rightFollower.setControl(new Follower(ElevatorConstants.leftLeaderId, true));
 
@@ -78,11 +74,10 @@ public class Elevator extends SubsystemBase{
         m_limitConfig.StatorCurrentLimitEnable = true;
 
         //make the current limit seperately later on
-        leftConfigurator.apply(m_limitConfig);
-        rightConfigurator.apply(m_limitConfig);
+        m_leftConfigurator.apply(m_limitConfig);
+        m_rightConfigurator.apply(m_limitConfig);
 
         //This sets the motor to rotate counterclockwise
-        currentConfigs.Inverted = InvertedValue.Clockwise_Positive;
         m_leftLeader.getConfigurator().apply(config);
 
         SmartDashboard.putNumber(ElevatorConstants.tableP, ElevatorConstants.kP);
@@ -107,40 +102,33 @@ public class Elevator extends SubsystemBase{
     }
 
     public void goToSetPoint(double setPoint){
-        System.out.printf("setpoint: %f", setPoint);
-        m_leftLeader.setControl(m_request.withPosition(setPoint));
+        //If we need to travel dowards then use smalled PID values
+        if(setPoint < getCurrentPosition()){
+            m_leftLeader.setControl(m_request.withPosition(setPoint).withSlot(1));
+        }else{
+            m_leftLeader.setControl(m_request.withPosition(setPoint).withSlot(0));
+        }
     }
 
     public Command c_goToSetPoint(Level level){
-        return startEnd(() -> goToSetPoint(goToLevel(level)), () -> motorOff(m_leftLeader));
+        return startEnd(() -> goToSetPoint(levelToSetPoint(level)), () -> motorOff(m_leftLeader));
     }
 
     public double getCurrentPosition() {
         return m_leftLeader.getPosition().getValueAsDouble();
     }
 
-      public void setPID(){
 
-        double p = SmartDashboard.getNumber(ElevatorConstants.tableP, ElevatorConstants.kP);
-        double i = SmartDashboard.getNumber(ElevatorConstants.tableI, ElevatorConstants.kI);
-        double d = SmartDashboard.getNumber(ElevatorConstants.tableD, ElevatorConstants.kD);
-
-      }
-
-
-      public Command c_moveElevator(double speed){
+    public Command c_moveElevator(double speed){
         return startEnd(() -> setMotors(speed), () -> motorOff(m_leftLeader));
     }
 
     @Override
     public void periodic() {
-        // TODO Auto-generated method stub
-        super.periodic();
 
-        setPID();
     }
 
-    public double goToLevel(Level level){
+    public double levelToSetPoint(Level level){
         switch(level){
             case LEVEL_1: return 2.3;
             case LEVEL_2: return 3.6;
@@ -158,6 +146,10 @@ public class Elevator extends SubsystemBase{
     }
 
     public Command c_hold(){
-        return startEnd(()-> goToSetPoint(m_hold_value), () -> holdEnd());
+        //If our elevator is below LEVEL_1 don't continue to run the motor
+        if(m_hold_value > levelToSetPoint(Level.LEVEL_1)){
+            return startEnd(()-> goToSetPoint(m_hold_value), () -> holdEnd());
+        }
+        return startEnd(null,  () -> holdEnd());
     }
 }
