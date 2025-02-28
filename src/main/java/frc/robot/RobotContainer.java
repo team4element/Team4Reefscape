@@ -13,10 +13,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.ApproachApriltag;
-import frc.robot.Commands.AutoMove;
 import frc.robot.Commands.HoldAngle;
 import frc.robot.Commands.IntakeAlgae;
 import frc.robot.Commands.Shift;
@@ -69,8 +66,8 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(ControllerConstants.driverController.getLeftY() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive forward with negative Y (forward)
-                    .withVelocityY(ControllerConstants.driverController.getLeftX() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive left with negative X (left)
+                drive.withVelocityX(-ControllerConstants.driverController.getLeftY() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive forward with negative Y (forward)
+                    .withVelocityY(-ControllerConstants.driverController.getLeftX() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive left with negative X (left)
                     .withRotationalRate(-ControllerConstants.driverController.getRightX() * MaxAngularRate * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive counterclockwise with negative X (left)
             )
         );
@@ -78,7 +75,6 @@ public class RobotContainer {
         m_pivot.setDefaultCommand(m_pivot.c_pivotManual());
         m_elevator.setDefaultCommand(m_elevator.c_hold());
 
-        ControllerConstants.driverController.a().whileTrue(new AutoMove(drivetrain, m_vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_VERTICAL));
         ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed, MaxAngularRate));
         //ControllerConstants.driverController.b().whileTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_HORIZONTAL));
         ControllerConstants.driverController.b().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed));
@@ -97,6 +93,7 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
         ControllerConstants.driverController.start().onTrue(drivetrain.c_updateSpeed(1));
         ControllerConstants.driverController.back().onTrue(drivetrain.c_updateSpeed(-1));
+        ControllerConstants.driverController.pov(270).onTrue(getAutonomousCommand());
 
         //Operator Controls
         ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
