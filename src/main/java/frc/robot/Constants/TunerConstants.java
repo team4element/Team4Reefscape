@@ -8,8 +8,11 @@ import com.ctre.phoenix6.hardware.*;
 import com.ctre.phoenix6.signals.*;
 import com.ctre.phoenix6.swerve.*;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
+import com.pathplanner.lib.config.RobotConfig;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
@@ -53,6 +56,10 @@ public class TunerConstants {
     // This needs to be tuned to your individual robot
     private static final Current kSlipCurrent = Amps.of(120.0);
 
+    // This is the value of our rotation on the field for Pathplanner
+    //TODO check if this value is messing up the orientation of drivetrain's actions
+    public static Angle defaultPathPlannerAngle  = Degrees.of(0);
+
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
     // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
     private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration();
@@ -66,7 +73,7 @@ public class TunerConstants {
         );
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
-    private static final Pigeon2Configuration pigeonConfigs = null;
+    public static final Pigeon2Configuration pigeonConfigs = null;
 
     // CAN bus that the devices are located on;
     // All swerve devices must share the same CAN bus
@@ -87,7 +94,7 @@ public class TunerConstants {
     private static final boolean kInvertLeftSide = false;
     private static final boolean kInvertRightSide = true;
 
-    private static final int kPigeonId = 0;
+    public static final int kPigeonId = 0;
 
     // These are only used for simulation
     private static final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.01);
@@ -169,6 +176,8 @@ public class TunerConstants {
     private static final Distance kBackRightXPos = Inches.of(-13);
     private static final Distance kBackRightYPos = Inches.of(-13);
 
+    public static final Rotation2d kRotation = new Rotation2d();
+    public static final Translation2d kTranslation = new Translation2d();
 
     public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FrontLeft =
         ConstantCreator.createModuleConstants(

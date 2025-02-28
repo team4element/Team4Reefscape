@@ -8,9 +8,13 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.ApproachApriltag;
 import frc.robot.Commands.AutoMove;
 import frc.robot.Commands.HoldAngle;
@@ -29,6 +33,9 @@ import frc.robot.subsystems.LowerJaw;
 import frc.robot.subsystems.Pivot;
 
 public class RobotContainer {
+
+    SendableChooser<Command> sendableAuton; 
+
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.55).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 //.75
@@ -48,6 +55,10 @@ public class RobotContainer {
     public final Pivot    m_pivot    = new Pivot();
 
     public RobotContainer() {
+        // creates a menu on shuffle board for autons
+        sendableAuton = AutoBuilder.buildAutoChooser();
+        SmartDashboard.putData("Auto Chooser", sendableAuton);
+
         configureBindings();
         ShuffleboardHelper.getInstance().initialize();
     }
@@ -106,14 +117,13 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-
-        return  Commands.print("No autonomous command configured");
-        //return sendableAuton.getSelected();
+        return sendableAuton.getSelected();
     }
 
     public Command c_fieldRelative(){
         return drivetrain.applyRequest(() -> drive);
     }
+
     // private SequentialCommandGroup LevelOne(double rpmTop, double rpmBot, double timeout, double elevatorSpeed, double armAngle) {
     // return new SequentialCommandGroup(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint),
 
@@ -125,5 +135,4 @@ public class RobotContainer {
         m_pivot.resetPivotEncoder();
         m_elevator.resetEncoders();
     }
-
 }
