@@ -44,7 +44,6 @@ public class Shift extends Command {
   @Override
   public void initialize() {
     m_is_finished = false;
-    m_vision.switchPipeline(Vision.Pipeline.TWO_DIMENSIONAL);
     m_threshold = .2;
   }
 
