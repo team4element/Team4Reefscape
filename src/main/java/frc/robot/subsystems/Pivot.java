@@ -84,7 +84,7 @@ public class Pivot extends SubsystemBase {
 
   private double positionToSetpoint(Level level){
     switch (level) {
-        case LEVEL_1: return 0;
+        case LEVEL_1: return 0.2;
         case LEVEL_2: return -3.5; //Estimate have to test
         case LEVEL_3: return -3.5; //Estimate have to test
         case LEVEL_4: return 0;
