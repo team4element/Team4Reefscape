@@ -153,6 +153,6 @@ public class Elevator extends SubsystemBase {
         if (m_hold_value > levelToSetPoint(Level.LEVEL_1)) {
             return startEnd(() -> goToSetPoint(m_hold_value), () -> holdEnd());
         }
-        return startEnd(null, () -> holdEnd());
+        return startEnd( ()-> holdEnd(), () -> holdEnd());
     }
 }
