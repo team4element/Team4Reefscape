@@ -26,12 +26,13 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.UpperJaw;
 import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Vision.Pipeline;
 import frc.robot.subsystems.LowerJaw;
 import frc.robot.subsystems.Pivot;
 
 public class RobotContainer {
 
-    SendableChooser<Command> sendableAuton; 
+    SendableChooser<Command> sendableAuton;
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.55).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
@@ -93,7 +94,9 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
         ControllerConstants.driverController.start().onTrue(drivetrain.c_updateSpeed(1));
         ControllerConstants.driverController.back().onTrue(drivetrain.c_updateSpeed(-1));
-        ControllerConstants.driverController.pov(270).onTrue(getAutonomousCommand());
+        ControllerConstants.driverController.pov(270).onTrue(m_vision.c_ChangePipeline(Pipeline.LEFT_PIPE));
+        ControllerConstants.driverController.pov(90).onTrue(m_vision.c_ChangePipeline(Pipeline.RIGHT_PIPE));
+        ControllerConstants.driverController.pov(180).onTrue(m_vision.c_ChangePipeline(Pipeline.CENTER));
 
         //Operator Controls
         ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
