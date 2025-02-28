@@ -37,6 +37,8 @@ public class Robot extends TimedRobot {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     System.out.println(m_autonomousCommand.getName());
 
+    m_robotContainer.onEnable();
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
@@ -54,7 +56,6 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    m_robotContainer.onEnable();
   }
 
   @Override

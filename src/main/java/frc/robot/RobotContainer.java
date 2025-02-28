@@ -9,10 +9,12 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Commands.ApproachApriltag;
 import frc.robot.Commands.AutoMove;
@@ -57,6 +59,8 @@ public class RobotContainer {
     public final Pivot    m_pivot    = new Pivot();
 
     public RobotContainer() {
+
+        NamedCommands.registerCommand("align to apriltag", new Shift(drivetrain, m_vision, MaxSpeed));
         // creates a menu on shuffle board for autons
         sendableAuton = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", sendableAuton);
@@ -71,8 +75,8 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(ControllerConstants.driverController.getLeftY() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive forward with negative Y (forward)
-                    .withVelocityY(ControllerConstants.driverController.getLeftX() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive left with negative X (left)
+                drive.withVelocityX(-ControllerConstants.driverController.getLeftY() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive forward with negative Y (forward)
+                    .withVelocityY(-ControllerConstants.driverController.getLeftX() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive left with negative X (left)
                     .withRotationalRate(-ControllerConstants.driverController.getRightX() * MaxAngularRate * drivetrain.speedToDouble(drivetrain.m_speed)) // Drive counterclockwise with negative X (left)
             )
         );
@@ -111,8 +115,8 @@ public class RobotContainer {
         ControllerConstants.operatorController.a().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_1));
         ControllerConstants.operatorController.b().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_2));
         ControllerConstants.operatorController.y().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_3));
-        ControllerConstants.operatorController.x().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_4));
-        ControllerConstants.operatorController.start().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.CORAL_STATION));
+       // ControllerConstants.operatorController.x().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_4));
+        ControllerConstants.operatorController.x().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.CORAL_STATION));
         ControllerConstants.operatorController.back().whileTrue(m_pivot.c_goToSetPoint(Elevator.Level.LEVEL_1));
 
         //ControllerConstants.operatorController.a().onTrue(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint));
@@ -125,6 +129,19 @@ public class RobotContainer {
     public Command c_fieldRelative(){
         return drivetrain.applyRequest(() -> drive);
     }
+
+    // private SequentialCommandGroup LevelOne(){
+    //     return new SequentialCommandGroup(m_elevator.c_goToSetPoint(Level.LEVEL_1), m_pivot.c_goToSetPoint(Level.LEVEL_1));
+    // }
+    // private SequentialCommandGroup LevelTwo(){
+    //     return new SequentialCommandGroup(m_elevator.c_goToSetPoint(Level.LEVEL_2), m_pivot.c_goToSetPoint(Level.LEVEL_2));
+    // }
+    // private SequentialCommandGroup LevelThree(){
+    //     return new SequentialCommandGroup(m_elevator.c_goToSetPoint(Level.LEVEL_3), m_pivot.c_goToSetPoint(Level.LEVEL_3));
+    // }
+    // private SequentialCommandGroup CoralStation(){
+    //     return new SequentialCommandGroup(m_elevator.c_goToSetPoint(Level.CORAL_STATION), m_pivot.c_goToSetPoint(Level.CORAL_STATION));
+    // }
 
     // private SequentialCommandGroup LevelOne(double rpmTop, double rpmBot, double timeout, double elevatorSpeed, double armAngle) {
     // return new SequentialCommandGroup(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint),
