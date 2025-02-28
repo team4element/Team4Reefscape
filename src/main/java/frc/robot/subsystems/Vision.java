@@ -12,7 +12,7 @@ import frc.robot.Constants.VisionConstants;
 public class Vision extends SubsystemBase {
 
   public double lastKnownTargetDistanceInches;
- 
+
   public enum LedState {
     ON,
     OFF,
@@ -31,28 +31,28 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-  if (hasTarget()) {
-    double angleToGoalDegrees = VisionConstants.limelightMountAngleDegrees + getVerticalOffset();
-    double angleToGoalRadians = angleToGoalDegrees * VisionConstants.radianMeasurement;
+    if (hasTarget()) {
+      double angleToGoalDegrees = VisionConstants.limelightMountAngleDegrees + getVerticalOffset();
+      double angleToGoalRadians = angleToGoalDegrees * VisionConstants.radianMeasurement;
 
-    //calculate distance
-    lastKnownTargetDistanceInches = (VisionConstants.goalHeightInches - VisionConstants.limelightLensHeightInches) 
-    / Math.tan(angleToGoalRadians);
-  } 
-    //System.out.println(distanceFromLimelightToGoalInches);
+      // calculate distance
+      lastKnownTargetDistanceInches = (VisionConstants.goalHeightInches - VisionConstants.limelightLensHeightInches)
+          / Math.tan(angleToGoalRadians);
+    }
+    // System.out.println(distanceFromLimelightToGoalInches);
   }
 
   // public double VerticalOffset(){
 
-  //   double offset;
+  // double offset;
 
-  //   if(hasTarget()){
-  //      offset = getVerticalOffset();
-  //   }
-  //   // else {
-  //   //   offset = 0;
-  //   // }
-  //   return offset;
+  // if(hasTarget()){
+  // offset = getVerticalOffset();
+  // }
+  // // else {
+  // // offset = 0;
+  // // }
+  // return offset;
   // }
 
   /**
@@ -62,7 +62,7 @@ public class Vision extends SubsystemBase {
    */
   public void controlLED(LedState led_state) {
     switch (led_state) {
-      case ON: 
+      case ON:
         LimelightHelpers.setLEDMode_ForceOn("");
         break;
       case OFF:
@@ -79,6 +79,7 @@ public class Vision extends SubsystemBase {
 
   /**
    * Switch between pipelines
+   * 
    * @param pipeline The pipeline you want to switch to
    */
   public void switchPipeline(Pipeline pipeline) {
@@ -94,7 +95,7 @@ public class Vision extends SubsystemBase {
     return -LimelightHelpers.getTY("");
   }
 
-  public Pose3d getTarget3DPose(){
+  public Pose3d getTarget3DPose() {
     return LimelightHelpers.getTargetPose3d_RobotSpace("");
   }
 

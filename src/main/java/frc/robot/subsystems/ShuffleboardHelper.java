@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 public class ShuffleboardHelper {
     private static ShuffleboardHelper instance;
+
     public static ShuffleboardHelper getInstance() {
         if (instance == null) {
             instance = new ShuffleboardHelper();

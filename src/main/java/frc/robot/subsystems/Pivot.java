@@ -12,7 +12,6 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,22 +26,21 @@ public class Pivot extends SubsystemBase {
   private PositionVoltage m_request;
   private DutyCycleOut m_duty_cycle;
 
-  
   public Pivot() {
-      config = new TalonFXConfiguration();
-      m_jawPivot = new TalonFX(JawConstants.jawPivotId);
-      m_duty_cycle = new DutyCycleOut(.8);
-      m_request = new PositionVoltage(0);
+    config = new TalonFXConfiguration();
+    m_jawPivot = new TalonFX(JawConstants.jawPivotId);
+    m_duty_cycle = new DutyCycleOut(.8);
+    m_request = new PositionVoltage(0);
 
-      config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
-      config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
-      // config.Feedback.SensorToMechanismRatio = 12;
-      config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-      config.Slot0.kP =  .5;
-      // config.Slot0.kD = .001;
-      config.Slot0.kV = .004;
-      // config.Slot0.kA = .004;
-      m_jawPivot.getConfigurator().apply(config);
+    config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
+    config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
+    // config.Feedback.SensorToMechanismRatio = 12;
+    config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+    config.Slot0.kP = .5;
+    // config.Slot0.kD = .001;
+    config.Slot0.kV = .004;
+    // config.Slot0.kA = .004;
+    m_jawPivot.getConfigurator().apply(config);
   }
 
   @Override
@@ -50,48 +48,53 @@ public class Pivot extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public void motorOff(){
-    m_jawPivot.set(0);
-    m_jawPivot.setNeutralMode(NeutralModeValue.Brake);     
-  }
-
-      //Pivot to move the Coral intake
-  public void manualPivot(double speed){
-      final double max_speed = .3;
-      m_jawPivot.setControl(m_duty_cycle.withOutput(speed * max_speed));
-  }
-
-  public Command c_pivotManual(){
-    return Commands.run(() -> manualPivot(ControllerConstants.operatorController.getLeftY()), this);
-  }
-
-  public void goToSetPoint(double setPoint){
-    m_jawPivot.setControl(m_request.withPosition(setPoint));
-  }
-
-  public void jawOff(){
+  public void motorOff() {
     m_jawPivot.set(0);
     m_jawPivot.setNeutralMode(NeutralModeValue.Brake);
   }
 
-  public Command c_goToSetPoint(Level position){
+  // Pivot to move the Coral intake
+  public void manualPivot(double speed) {
+    final double max_speed = .3;
+    m_jawPivot.setControl(m_duty_cycle.withOutput(speed * max_speed));
+  }
+
+  public Command c_pivotManual() {
+    return Commands.run(() -> manualPivot(ControllerConstants.operatorController.getLeftY()), this);
+  }
+
+  public void goToSetPoint(double setPoint) {
+    m_jawPivot.setControl(m_request.withPosition(setPoint));
+  }
+
+  public void jawOff() {
+    m_jawPivot.set(0);
+    m_jawPivot.setNeutralMode(NeutralModeValue.Brake);
+  }
+
+  public Command c_goToSetPoint(Level position) {
     return startEnd(() -> goToSetPoint(positionToSetpoint(position)), () -> jawOff());
   }
 
-  public void resetPivotEncoder(){
+  public void resetPivotEncoder() {
     m_jawPivot.setPosition(0);
   }
 
-  private double positionToSetpoint(Level level){
+  private double positionToSetpoint(Level level) {
     switch (level) {
-        case LEVEL_1: return 0;
-        case LEVEL_2: return -3.5; //Estimate have to test
-        case LEVEL_3: return -3.5; //Estimate have to test
-        case LEVEL_4: return 0;
-        case CORAL_STATION: return .2;
+      case LEVEL_1:
+        return 0;
+      case LEVEL_2:
+        return -3.5; // Estimate have to test
+      case LEVEL_3:
+        return -3.5; // Estimate have to test
+      case LEVEL_4:
+        return 0;
+      case CORAL_STATION:
+        return .2;
 
-        //-.4 max
-        //.2 max
+      // -.4 max
+      // .2 max
     }
 
     return 0;
