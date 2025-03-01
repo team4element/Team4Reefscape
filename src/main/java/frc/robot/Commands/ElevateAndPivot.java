@@ -9,8 +9,8 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.Level;
 import frc.robot.subsystems.Pivot;
 
-public class ElevateAndJaw extends ParallelCommandGroup {
-  public ElevateAndJaw(Elevator elevator, Pivot pivot, Level elevatorLevel) {
+public class ElevateAndPivot extends ParallelCommandGroup {
+  public ElevateAndPivot(Elevator elevator, Pivot pivot, Level elevatorLevel) {
     addCommands(elevator.c_goToSetPoint(elevatorLevel), pivot.c_goToSetPoint(elevatorLevel));
   }
 }
