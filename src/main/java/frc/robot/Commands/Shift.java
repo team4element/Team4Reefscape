@@ -53,8 +53,7 @@ public class Shift extends Command {
     //testing horizontal movement (in progress and might change back to angular movement)
     if (m_vision.hasTarget() && m_threshold < Math.abs(m_vision.getVerticalOffset())) { // + 1.85
         m_drive_train.setControl(
-          m_drive
-           .withVelocityY(m_pid.calculate(m_vision.getVerticalOffset()) * m_max_speed)); // +2.2
+          m_drive.withVelocityY(m_pid.calculate(m_vision.getVerticalOffset() * m_max_speed))); // +2.2
     }else{
         m_is_finished = true;
     }

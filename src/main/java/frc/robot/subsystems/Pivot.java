@@ -34,12 +34,9 @@ public class Pivot extends SubsystemBase {
 
     config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
     config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
-    // config.Feedback.SensorToMechanismRatio = 12;
     config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    config.Slot0.kP = .5;
-    // config.Slot0.kD = .001;
+    config.Slot0.kP =  .6;
     config.Slot0.kV = .004;
-    // config.Slot0.kA = .004;
     m_jawPivot.getConfigurator().apply(config);
   }
 

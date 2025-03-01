@@ -126,18 +126,13 @@ public class Elevator extends SubsystemBase {
 
     }
 
-    public double levelToSetPoint(Level level) {
-        switch (level) {
-            case LEVEL_1:
-                return 2.3;
-            case LEVEL_2:
-                return 3.6;
-            case LEVEL_3:
-                return 5.6;
-            case LEVEL_4:
-                return 7.3;
-            case CORAL_STATION:
-                return 3.2;
+    public double goToLevel(Level level){
+        switch(level){
+            case LEVEL_1: return 2.3;
+            case LEVEL_2: return 3.6;
+            case LEVEL_3: return 5.6;
+            case LEVEL_4: return 7.3;
+            case CORAL_STATION: return 3.8;
         }
 
         return 3;
@@ -154,5 +149,21 @@ public class Elevator extends SubsystemBase {
             return startEnd(() -> goToSetPoint(m_hold_value), () -> holdEnd());
         }
         return startEnd(null, () -> holdEnd());
+    }
+
+    public double levelToSetPoint(Level level) {
+        switch (level) {
+            case LEVEL_1:
+                return 2.3;
+            case LEVEL_2:
+                return 3.6;
+            case LEVEL_3:
+                return 5.6;
+            case LEVEL_4:
+                return 7.3;
+            case CORAL_STATION:
+                return 3.2;
+        }
+        return 3;
     }
 }
