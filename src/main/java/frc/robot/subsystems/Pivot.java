@@ -79,7 +79,7 @@ public class Pivot extends SubsystemBase {
 
   public double my_deadband(double input){
     final double deadband = .2;
-    return input > Math.abs(deadband) ? input : 0; 
+    return Math.abs(input) > deadband ? input : 0; 
   }
 
   private double positionToSetpoint(Level level) {
