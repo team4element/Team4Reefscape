@@ -73,6 +73,22 @@ public class Vision extends SubsystemBase {
     LimelightHelpers.setPipelineIndex("", pipeline.ordinal());
   }
 
+  public void switchPipeline(int dir) {
+    int pipeline_index = currentPipeline().ordinal() + dir;
+    if(pipeline_index > Pipeline.RIGHT_PIPE.ordinal()){
+      switchPipeline(Pipeline.CENTER);
+    }else if(pipeline_index < Pipeline.CENTER.ordinal()){
+      switchPipeline(Pipeline.RIGHT_PIPE);
+    }else{
+      switchPipeline(Pipeline.values()[pipeline_index]);
+    }
+  }
+
+  public Pipeline currentPipeline(){
+    int index = (int)LimelightHelpers.getCurrentPipelineIndex("");
+    return Pipeline.values()[index];
+  }
+
   public double getHorizontalOffset() {
     return LimelightHelpers.getTX("");
   }
@@ -94,4 +110,7 @@ public class Vision extends SubsystemBase {
     return runOnce(() -> switchPipeline(pipeline));
   }
 
+  public Command c_ChangePipeline(int dir){
+    return runOnce(() -> switchPipeline(dir));
+  }
 }
