@@ -21,9 +21,9 @@ public class Vision extends SubsystemBase {
   }
 
   public enum Pipeline {
+    CENTER,
     LEFT_PIPE,
     RIGHT_PIPE,
-    CENTER,
   }
 
   public Vision() {
