@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Commands.ApproachApriltag;
+import frc.robot.Commands.ElevateAndPivot;
 import frc.robot.Commands.HoldAngle;
 import frc.robot.Commands.IntakeAlgae;
 import frc.robot.Commands.Shift;
@@ -49,7 +50,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    public final Vision m_vision = new Vision();
+    public final Vision m_vision     = new Vision();
     public final UpperJaw m_upperJaw = new UpperJaw();
     public final LowerJaw m_lowerJaw = new LowerJaw();
     public final Elevator m_elevator = new Elevator();
@@ -87,14 +88,10 @@ public class RobotContainer {
         m_climb.setDefaultCommand(m_climb.c_pivotManual());
 
         ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed, MaxAngularRate));
-        //ControllerConstants.driverController.b().whileTrue(new AutoMove(drivetrain, vision, CommandSwerveDrivetrain.AutoMoveAction.MOVE_HORIZONTAL));
         ControllerConstants.driverController.y().whileTrue(new ApproachApriltag(drivetrain, m_vision, 13, 3.0));
         
         ControllerConstants.driverController.povLeft().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed));
         ControllerConstants.driverController.povRight().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed));
-        // ControllerConstants.driverController.b().whileTrue(drivetrain.applyRequest(() ->
-        //     point.withModuleDirection(new Rotation2d(-ControllerConstants.driverController.getLeftY(), -ControllerConstants.driverController.getLeftX()))
-        // ));
        
         ControllerConstants.driverController.leftBumper().onTrue(drivetrain.c_seedFieldRelative());
         // Run SysId routines when holding back/start and X/Y.
@@ -119,7 +116,7 @@ public class RobotContainer {
 
         ControllerConstants.operatorController.povUp().whileTrue( m_elevator.c_moveElevator(ElevatorConstants.manualSpeed));
         ControllerConstants.operatorController.povDown().whileTrue( m_elevator.c_moveElevator(-ElevatorConstants.manualSpeed));
-        ControllerConstants.operatorController.a().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_1));
+        ControllerConstants.operatorController.a().whileTrue(new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_1));
        // ControllerConstants.operatorController.a().whileTrue(LevelOne());
         ControllerConstants.operatorController.b().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_2));
         ControllerConstants.operatorController.y().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_3));
@@ -138,25 +135,7 @@ public class RobotContainer {
         return drivetrain.applyRequest(() -> drive);
     }
 
-    private SequentialCommandGroup LevelOne(){
-        return new SequentialCommandGroup(m_elevator.c_goToSetPoint(Level.LEVEL_1), m_pivot.c_goToSetPoint(Level.LEVEL_1));
-    }
-    // private SequentialCommandGroup LevelTwo(){
-    //     return new SequentialCommandGroup(m_elevator.c_goToSetPoint(Level.LEVEL_2), m_pivot.c_goToSetPoint(Level.LEVEL_2));
-    // }
-    // private SequentialCommandGroup LevelThree(){
-    //     return new SequentialCommandGroup(m_elevator.c_goToSetPoint(Level.LEVEL_3), m_pivot.c_goToSetPoint(Level.LEVEL_3));
-    // }
-    // private SequentialCommandGroup CoralStation(){
-    //     return new SequentialCommandGroup(m_elevator.c_goToSetPoint(Level.CORAL_STATION), m_pivot.c_goToSetPoint(Level.CORAL_STATION));
-    // }
-
-    // private SequentialCommandGroup LevelOne(double rpmTop, double rpmBot, double timeout, double elevatorSpeed, double armAngle) {
-    // return new SequentialCommandGroup(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint),
-
     // new SequentialCommandGroup(m_lowerJaw.c_intakeCoral(JawAction.OUTTAKE_CORAL, .5).withTimeout(1)));
-
-    // }
 
     public void onEnable(){
         m_pivot.resetPivotEncoder();
