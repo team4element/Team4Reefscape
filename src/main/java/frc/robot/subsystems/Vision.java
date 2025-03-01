@@ -19,6 +19,11 @@ public class Vision extends SubsystemBase {
     BLINK
   }
 
+  public static enum shiftDirection{
+    LEFT,
+    RIGHT
+  }
+
   public enum Pipeline {
     TWO_DIMENSIONAL,
     THREE_DIMENSIONAL,
@@ -100,6 +105,14 @@ public class Vision extends SubsystemBase {
 
   public boolean hasTarget() {
     return LimelightHelpers.getTV("");
+  }
+
+  public double goToSide(shiftDirection direction){
+    switch(direction){
+      case LEFT   : return 2;
+      case RIGHT  : return -2;
+    }
+    return 1;
   }
 
 }

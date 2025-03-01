@@ -12,7 +12,6 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -38,7 +37,7 @@ public class Pivot extends SubsystemBase {
       config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
       // config.Feedback.SensorToMechanismRatio = 12;
       config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-      config.Slot0.kP =  .5;
+      config.Slot0.kP =  .6; //.5
       // config.Slot0.kD = .001;
       config.Slot0.kV = .004;
       // config.Slot0.kA = .004;
@@ -84,7 +83,7 @@ public class Pivot extends SubsystemBase {
 
   private double positionToSetpoint(Level level){
     switch (level) {
-        case LEVEL_1: return 0.2;
+        case LEVEL_1: return 0;
         case LEVEL_2: return -3.5; //Estimate have to test
         case LEVEL_3: return -3.5; //Estimate have to test
         case LEVEL_4: return 0;

@@ -14,7 +14,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class Elevator extends SubsystemBase{
@@ -121,9 +123,9 @@ public class Elevator extends SubsystemBase{
 
       public void setPID(){
 
-        double p = SmartDashboard.getNumber(ElevatorConstants.tableP, ElevatorConstants.kP);
-        double i = SmartDashboard.getNumber(ElevatorConstants.tableI, ElevatorConstants.kI);
-        double d = SmartDashboard.getNumber(ElevatorConstants.tableD, ElevatorConstants.kD);
+        // double p = SmartDashboard.getNumber(ElevatorConstants.tableP, ElevatorConstants.kP);
+        // double i = SmartDashboard.getNumber(ElevatorConstants.tableI, ElevatorConstants.kI);
+        // double d = SmartDashboard.getNumber(ElevatorConstants.tableD, ElevatorConstants.kD);
 
       }
 
@@ -146,7 +148,7 @@ public class Elevator extends SubsystemBase{
             case LEVEL_2: return 3.6;
             case LEVEL_3: return 5.6;
             case LEVEL_4: return 7.3;
-            case CORAL_STATION: return 3.2;
+            case CORAL_STATION: return 3.8;
         }
 
         return 3;
@@ -157,7 +159,20 @@ public class Elevator extends SubsystemBase{
         m_rightFollower.setPosition(0);
     }
 
+    public void manualPivot(double speed){
+        final double max_speed = .3;
+        m_leftLeader.setControl(m_leftDutyCycle.withOutput(speed * max_speed));
+    }
+
+    public Command c_elevatorManual(){
+    return Commands.run(() -> manualPivot(ControllerConstants.operatorController.getRightY()), this);
+  }
+
     public Command c_hold(){
         return startEnd(()-> goToSetPoint(m_hold_value), () -> holdEnd());
     }
+
+    // public ParallelCommandGroup c_default(){
+    //     return new ParallelCommandGroup(c_elevatorManual(), c_hold());
+    // }
 }

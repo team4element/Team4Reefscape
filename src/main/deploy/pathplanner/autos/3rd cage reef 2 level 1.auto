@@ -5,39 +5,27 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "3rd cage to reef 2 left"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "align to apriltag"
+            "name": "elevator level 1"
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "3rd cage to reef 2 algae"
+            "name": "outtake coral"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "reef 2 shift"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "reef 2 to end field"
+            "pathName": "reef 2 to end field left"
           }
         }
       ]
