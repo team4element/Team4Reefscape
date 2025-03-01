@@ -84,7 +84,7 @@ public class RobotContainer {
         );
 
         m_pivot.setDefaultCommand(m_pivot.c_pivotManual());
-        m_elevator.setDefaultCommand(m_elevator.c_hold());
+        m_elevator.setDefaultCommand(m_elevator.c_moveElevator());
         m_climb.setDefaultCommand(m_climb.c_pivotManual());
 
         ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed, MaxAngularRate));
@@ -94,6 +94,10 @@ public class RobotContainer {
         ControllerConstants.driverController.povRight().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.RIGHT_PIPE));
        
         ControllerConstants.driverController.leftBumper().onTrue(drivetrain.c_seedFieldRelative());
+        ControllerConstants.driverController.povUp().onTrue(new Vision().c_ChangePipeline(1));
+        ControllerConstants.driverController.povDown().onTrue(new Vision().c_ChangePipeline(-1));
+
+        
         // Run SysId routines when holding back/start and X/Y.
 
         // Note that each routine should be run exactly once in a single log.
@@ -114,8 +118,6 @@ public class RobotContainer {
         ControllerConstants.operatorController.leftTrigger().whileTrue(new IntakeAlgae(m_upperJaw, m_lowerJaw, JawConstants.intakeSpeed, JawConstants.intakeSpeed));
         ControllerConstants.operatorController.rightTrigger().whileTrue(new IntakeAlgae(m_upperJaw, m_lowerJaw, JawConstants.topOuttakeSpeed, JawConstants.bottomOuttakeSpeed));
 
-        ControllerConstants.operatorController.povUp().whileTrue( m_elevator.c_moveElevator(ElevatorConstants.manualSpeed));
-        ControllerConstants.operatorController.povDown().whileTrue( m_elevator.c_moveElevator(-ElevatorConstants.manualSpeed));
         ControllerConstants.operatorController.a().whileTrue(new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_1));
        // ControllerConstants.operatorController.a().whileTrue(LevelOne());
         ControllerConstants.operatorController.b().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_2));
