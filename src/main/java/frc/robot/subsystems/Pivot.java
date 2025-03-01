@@ -57,7 +57,7 @@ public class Pivot extends SubsystemBase {
   }
 
   public Command c_pivotManual() {
-    return Commands.run(() -> manualPivot(ControllerConstants.operatorController.getLeftY()), this);
+    return Commands.run(() -> manualPivot(my_deadband(ControllerConstants.operatorController.getLeftY())), this);
   }
 
   public void goToSetPoint(double setPoint) {
@@ -77,18 +77,18 @@ public class Pivot extends SubsystemBase {
     m_jawPivot.setPosition(0);
   }
 
+  public double my_deadband(double input){
+    final double deadband = .2;
+    return input > Math.abs(deadband) ? input : 0; 
+  }
+
   private double positionToSetpoint(Level level) {
     switch (level) {
-      case LEVEL_1:
-        return 0;
-      case LEVEL_2:
-        return -3.5; // Estimate have to test
-      case LEVEL_3:
-        return -3.5; // Estimate have to test
-      case LEVEL_4:
-        return 0;
-      case CORAL_STATION:
-        return .2;
+      case LEVEL_1      : return 0;
+      case LEVEL_2      : return -3.5; // Estimate have to test
+      case LEVEL_3      : return -3.5; // Estimate have to test
+      case LEVEL_4      : return 0;
+      case CORAL_STATION: return .2;
 
       // -.4 max
       // .2 max
