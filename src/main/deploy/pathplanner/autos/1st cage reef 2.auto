@@ -13,13 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "reef 2 shift"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "reef 2 to end field"
+            "pathName": "reef 2 to end field left"
           }
         }
       ]

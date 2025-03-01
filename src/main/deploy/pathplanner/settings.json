@@ -1,6 +1,6 @@
 {
-  "robotWidth": 0.708,
-  "robotLength": 0.708,
+  "robotWidth": 0.8001,
+  "robotLength": 0.8,
   "holonomicMode": true,
   "pathFolders": [
     "reef 1",
@@ -14,7 +14,7 @@
   "defaultMaxAngAccel": 720.0,
   "defaultNominalVoltage": 12.0,
   "robotMass": 56.699,
-  "robotMOI": 6.883,
+  "robotMOI": 5.227,
   "robotTrackwidth": 0.546,
   "driveWheelRadius": 0.051,
   "driveGearing": 5.9,

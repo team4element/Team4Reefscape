@@ -13,6 +13,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class Elevator extends SubsystemBase {
@@ -117,8 +118,18 @@ public class Elevator extends SubsystemBase {
         return m_leftLeader.getPosition().getValueAsDouble();
     }
 
-    public Command c_moveElevator(double speed) {
-        return startEnd(() -> setMotors(speed), () -> motorOff(m_leftLeader));
+    public double my_deadband(double input){
+        final double deadband = .2;
+        return input > Math.abs(deadband) ? input : 0; 
+      }
+
+    public Command c_moveElevator() {
+        double speed = ControllerConstants.operatorController.getRightY();
+        if(my_deadband(speed) != 0){
+            return startEnd(() -> setMotors(speed), () -> motorOff(m_leftLeader));
+        }else{
+            return startEnd(() -> goToSetPoint(m_hold_value), () -> holdEnd());
+        }
     }
 
     @Override
@@ -126,18 +137,13 @@ public class Elevator extends SubsystemBase {
 
     }
 
-    public double levelToSetPoint(Level level) {
-        switch (level) {
-            case LEVEL_1:
-                return 2.3;
-            case LEVEL_2:
-                return 3.6;
-            case LEVEL_3:
-                return 5.6;
-            case LEVEL_4:
-                return 7.3;
-            case CORAL_STATION:
-                return 3.2;
+    public double goToLevel(Level level){
+        switch(level){
+            case LEVEL_1: return 2.3;
+            case LEVEL_2: return 3.6;
+            case LEVEL_3: return 5.6;
+            case LEVEL_4: return 7.3;
+            case CORAL_STATION: return 3.8;
         }
 
         return 3;
@@ -154,5 +160,21 @@ public class Elevator extends SubsystemBase {
             return startEnd(() -> goToSetPoint(m_hold_value), () -> holdEnd());
         }
         return startEnd( ()-> holdEnd(), () -> holdEnd());
+    }
+
+    public double levelToSetPoint(Level level) {
+        switch (level) {
+            case LEVEL_1:
+                return 2.3;
+            case LEVEL_2:
+                return 3.6;
+            case LEVEL_3:
+                return 5.6;
+            case LEVEL_4:
+                return 7.3;
+            case CORAL_STATION:
+                return 3.2;
+        }
+        return 3;
     }
 }
