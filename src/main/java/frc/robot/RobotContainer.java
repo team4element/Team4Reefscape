@@ -59,8 +59,8 @@ public class RobotContainer {
 
     public RobotContainer() {
 
-        NamedCommands.registerCommand("align to left side", new Shift(drivetrain, m_vision, MaxSpeed));
-        NamedCommands.registerCommand("align to right side", new Shift(drivetrain, m_vision, MaxSpeed));
+        NamedCommands.registerCommand("align to left side", new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.LEFT_PIPE));
+        NamedCommands.registerCommand("align to right side", new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.RIGHT_PIPE));
         NamedCommands.registerCommand("elevator level 1", m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_1));
         NamedCommands.registerCommand("outtake coral", m_lowerJaw.c_intakeCoral(JawConstants.topOuttakeSpeed));
         // creates a menu on shuffle board for autons
@@ -88,10 +88,10 @@ public class RobotContainer {
         m_climb.setDefaultCommand(m_climb.c_pivotManual());
 
         ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed, MaxAngularRate));
-        ControllerConstants.driverController.y().whileTrue(new ApproachApriltag(drivetrain, m_vision, 13, 3.0));
+        ControllerConstants.driverController.y().whileTrue(new ApproachApriltag(drivetrain, m_vision, 3.0));
         
-        ControllerConstants.driverController.povLeft().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed));
-        ControllerConstants.driverController.povRight().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed));
+        ControllerConstants.driverController.povLeft().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.LEFT_PIPE));
+        ControllerConstants.driverController.povRight().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.RIGHT_PIPE));
        
         ControllerConstants.driverController.leftBumper().onTrue(drivetrain.c_seedFieldRelative());
         // Run SysId routines when holding back/start and X/Y.

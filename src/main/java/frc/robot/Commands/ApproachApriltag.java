@@ -11,13 +11,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Vision.Pipeline;
 
 public class ApproachApriltag extends Command{
 
     CommandSwerveDrivetrain m_drivetrain;
     Vision m_limelight;
 
-    int m_target;
     SwerveRequest.RobotCentric m_drive;
     double m_speed;
     PIDController m_pid;
@@ -27,12 +27,11 @@ public class ApproachApriltag extends Command{
     Pose2d currentPose;
     double PValue;
 
-    public ApproachApriltag(CommandSwerveDrivetrain drivetrain, Vision limelight, int target, double speed){
+    public ApproachApriltag(CommandSwerveDrivetrain drivetrain, Vision limelight, double speed){
       
       m_drivetrain = drivetrain;
       m_limelight = limelight;
 
-      m_target = target;
       m_speed = speed;
 
       m_pid = new PIDController(VisionConstants.ApproachApriltag_P, VisionConstants.ApproachApriltag_I, VisionConstants.ApproachApriltag_D); //TODO better tune
@@ -50,6 +49,7 @@ public class ApproachApriltag extends Command{
  // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_limelight.switchPipeline(Pipeline.CENTER);
     m_is_finished = false;
     initialPose = m_drivetrain.getState().Pose;
   }
