@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "1st cage to reef 2 algae"
+            "pathName": "Middle coral"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "reef 2 to end field left"
+            "name": "elevator level 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "outtake coral"
           }
         }
       ]

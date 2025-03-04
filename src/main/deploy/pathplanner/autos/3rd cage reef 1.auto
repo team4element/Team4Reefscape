@@ -11,9 +11,15 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "reef 1 shift"
+            "name": "elevator level 2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "outtake coral"
           }
         },
         {
