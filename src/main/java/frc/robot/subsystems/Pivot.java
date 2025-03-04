@@ -37,6 +37,9 @@ public class Pivot extends SubsystemBase {
     config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
     config.Slot0.kP =  .6;
     config.Slot0.kV = .004;
+    config.Slot1.kP = 1.5;
+    config.Slot1.kV = .004;
+
     m_jawPivot.getConfigurator().apply(config);
   }
 
@@ -60,8 +63,8 @@ public class Pivot extends SubsystemBase {
     return Commands.run(() -> manualPivot(my_deadband(ControllerConstants.operatorController.getLeftY())), this);
   }
 
-  public void goToSetPoint(double setPoint) {
-    m_jawPivot.setControl(m_request.withPosition(setPoint));
+  public void goToSetPoint(double setPoint, int slot) {
+    m_jawPivot.setControl(m_request.withPosition(setPoint).withSlot(slot));
   }
 
   public void jawOff() {
@@ -69,8 +72,8 @@ public class Pivot extends SubsystemBase {
     m_jawPivot.setNeutralMode(NeutralModeValue.Brake);
   }
 
-  public Command c_goToSetPoint(Level position) {
-    return startEnd(() -> goToSetPoint(positionToSetpoint(position)), () -> jawOff());
+  public Command c_goToSetPoint(Level position, int slot) {
+    return startEnd(() -> goToSetPoint(positionToSetpoint(position), slot), () -> jawOff());
   }
 
   public void resetPivotEncoder() {
@@ -84,11 +87,12 @@ public class Pivot extends SubsystemBase {
 
   private double positionToSetpoint(Level level) {
     switch (level) {
-      case LEVEL_1      : return 0;
-      case LEVEL_2      : return -3.5; // Estimate have to test
-      case LEVEL_3      : return -3.5; // Estimate have to test
-      case LEVEL_4      : return 0;
-      case CORAL_STATION: return .2;
+      case LEVEL_1      : return -2.7;
+      case LEVEL_2      : return -2.5; // Estimate have to test
+      case LEVEL_3      : return -2.5; // Estimate have to test
+      case LEVEL_4      : return 0.5;
+      case CORAL_STATION: return 2.2;
+      case ALGAE        : return -4;
 
       // -.4 max
       // .2 max

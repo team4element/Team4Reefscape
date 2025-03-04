@@ -15,7 +15,7 @@ public class LevelSetPoints extends Command {
 
   @Override
   public void initialize() {
-    m_elevator.goToSetPoint(m_setpoint);
+    m_elevator.goToSetPoint(m_setpoint, 0);
   }
 
   @Override

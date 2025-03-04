@@ -17,7 +17,7 @@ public class JawConstants {
     public static final double lowerStatorLimit = 80;
     public static final double lowerSupplyLimit = 80;
 
-    public static final double intakeSpeed = .1;
+    public static final double intakeSpeed = .2;
     public static final double bottomOuttakeSpeed = -.1;
     public static final double topOuttakeSpeed = -.1;
     

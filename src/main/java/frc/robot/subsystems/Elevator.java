@@ -12,7 +12,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Commands.HoldAngle;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -33,7 +35,8 @@ public class Elevator extends SubsystemBase {
         LEVEL_2,
         LEVEL_3,
         LEVEL_4,
-        CORAL_STATION
+        CORAL_STATION,
+        ALGAE
     }
 
     public Elevator() {
@@ -43,10 +46,14 @@ public class Elevator extends SubsystemBase {
         config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
         config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
         config.Feedback.SensorToMechanismRatio = 9;
-        config.Slot0.kP = 9;
+
+        //Slot0 is the origial/faster version of PID
+        config.Slot0.kP = 11;
         config.Slot0.kD = .1;
         config.Slot0.kV = .005;
         config.Slot0.kA = .005;
+
+        //Slot1 is a slower version of PID
         config.Slot1.kP = 3;
         config.Slot1.kD = .1;
         config.Slot1.kV = .005;
@@ -87,7 +94,12 @@ public class Elevator extends SubsystemBase {
     }
 
     public void setMotors(double speed) {
-        m_leftLeader.setControl(m_leftDutyCycle.withOutput(speed));
+        if(my_deadband(speed) != 0){
+            m_leftLeader.setControl(m_leftDutyCycle.withOutput(speed));
+            m_hold_value = m_leftLeader.getPosition().getValueAsDouble();
+        }else{
+            goToSetPoint(m_hold_value, 0);
+        }
     }
 
     public void motorOff(TalonFX motor) {
@@ -101,17 +113,21 @@ public class Elevator extends SubsystemBase {
         m_leftLeader.setNeutralMode(NeutralModeValue.Brake);
     }
 
-    public void goToSetPoint(double setPoint) {
+    public void goToSetPoint(double setPoint, int slot) {
         // If we need to travel dowards then use smalled PID values
-        if (setPoint < getCurrentPosition()) {
-            m_leftLeader.setControl(m_request.withPosition(setPoint).withSlot(1));
-        } else {
-            m_leftLeader.setControl(m_request.withPosition(setPoint).withSlot(0));
-        }
+        // if (setPoint < getCurrentPosition()) {
+            m_leftLeader.setControl(m_request.withPosition(setPoint).withSlot(slot));
+        // } else {
+            // m_leftLeader.setControl(m_request.withPosition(setPoint).withSlot(0));
+        // }
     }
 
-    public Command c_goToSetPoint(Level level) {
-        return startEnd(() -> goToSetPoint(levelToSetPoint(level)), () -> motorOff(m_leftLeader));
+    public Command c_goToSetPoint(Level level, int slot) {
+        return startEnd(() -> goToSetPoint(levelToSetPoint(level), slot), () -> motorOff(m_leftLeader));
+    }
+
+    public Command c_lower() {
+        return startEnd(() -> goToSetPoint(levelToSetPoint(Level.LEVEL_1), 1), () -> motorOff(m_leftLeader));
     }
 
     public double getCurrentPosition() {
@@ -120,16 +136,11 @@ public class Elevator extends SubsystemBase {
 
     public double my_deadband(double input){
         final double deadband = .2;
-        return input > Math.abs(deadband) ? input : 0; 
-      }
+        return Math.abs(input) > deadband ? input : 0; 
+    }
 
     public Command c_moveElevator() {
-        double speed = ControllerConstants.operatorController.getRightY();
-        if(my_deadband(speed) != 0){
-            return startEnd(() -> setMotors(speed), () -> motorOff(m_leftLeader));
-        }else{
-            return startEnd(() -> goToSetPoint(m_hold_value), () -> holdEnd());
-        }
+        return Commands.run(() -> setMotors(my_deadband(-ControllerConstants.operatorController.getRightY()) * .5), this);
     }
 
     @Override
@@ -143,7 +154,7 @@ public class Elevator extends SubsystemBase {
             case LEVEL_2: return 3.6;
             case LEVEL_3: return 5.6;
             case LEVEL_4: return 7.3;
-            case CORAL_STATION: return 3.8;
+            case CORAL_STATION: return 3.7;
         }
 
         return 3;
@@ -157,7 +168,7 @@ public class Elevator extends SubsystemBase {
     public Command c_hold() {
         // If our elevator is below LEVEL_1 don't continue to run the motor
         if (m_hold_value > levelToSetPoint(Level.LEVEL_1)) {
-            return startEnd(() -> goToSetPoint(m_hold_value), () -> holdEnd());
+            return startEnd(() -> goToSetPoint(m_hold_value, 0), () -> holdEnd());
         }
         return startEnd( ()-> holdEnd(), () -> holdEnd());
     }
@@ -173,7 +184,7 @@ public class Elevator extends SubsystemBase {
             case LEVEL_4:
                 return 7.3;
             case CORAL_STATION:
-                return 3.2;
+                return 3.5;
         }
         return 3;
     }
