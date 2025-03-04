@@ -13,12 +13,17 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Commands.AlgaeForBarge;
 import frc.robot.Commands.ApproachApriltag;
+import frc.robot.Commands.BargeShot;
+import frc.robot.Commands.ClimbDown;
+import frc.robot.Commands.ClimbUp;
 import frc.robot.Commands.ElevateAndPivot;
 import frc.robot.Commands.HoldAngle;
 import frc.robot.Commands.IntakeAlgae;
 import frc.robot.Commands.Shift;
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.JawConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.subsystems.Climb;
@@ -41,7 +46,7 @@ public class RobotContainer {
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.RobotCentric drive = new SwerveRequest.RobotCentric()
-            .withDeadband(.2).withRotationalDeadband(.2) // Add a 10% deadband //0.3
+            .withDeadband(.4).withRotationalDeadband(.4) // Add a 10% deadband //0.3
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
@@ -58,8 +63,11 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("align to left side", new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.LEFT_PIPE));
         NamedCommands.registerCommand("align to right side", new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.RIGHT_PIPE));
-        NamedCommands.registerCommand("elevator level 1", m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_1));
-        NamedCommands.registerCommand("outtake coral", m_lowerJaw.c_intakeCoral(JawConstants.topOuttakeSpeed));
+        NamedCommands.registerCommand("level 1", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_1, 0, 0).withTimeout(1));
+        NamedCommands.registerCommand("level 2", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_2, 0, 0).withTimeout(1));
+        NamedCommands.registerCommand("level 3", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_3, 0, 0).withTimeout(1));
+        NamedCommands.registerCommand("outtake coral", m_lowerJaw.c_intakeCoral(JawConstants.topOuttakeSpeed).withTimeout(1));
+        NamedCommands.registerCommand("Lower elevator", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_1, 1, 0).withTimeout(1.5));
         // creates a menu on shuffle board for autons
         sendableAuton = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", sendableAuton);
@@ -82,7 +90,6 @@ public class RobotContainer {
 
         m_pivot.setDefaultCommand(m_pivot.c_pivotManual());
         m_elevator.setDefaultCommand(m_elevator.c_moveElevator());
-        m_climb.setDefaultCommand(m_climb.c_pivotManual());
 
         ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed, MaxAngularRate));
         ControllerConstants.driverController.y().whileTrue(new ApproachApriltag(drivetrain, m_vision, 3.0));
@@ -93,6 +100,8 @@ public class RobotContainer {
         ControllerConstants.driverController.leftBumper().onTrue(drivetrain.c_seedFieldRelative());
         ControllerConstants.driverController.povUp().onTrue(new Vision().c_ChangePipeline(1));
         ControllerConstants.driverController.povDown().onTrue(new Vision().c_ChangePipeline(-1));
+        ControllerConstants.driverController.leftTrigger().whileTrue(new ClimbDown(m_climb, 1));
+         ControllerConstants.driverController.rightTrigger().whileTrue(new ClimbUp(m_climb, 1));
 
         
         // Run SysId routines when holding back/start and X/Y.
@@ -112,16 +121,21 @@ public class RobotContainer {
         //Operator Controls
         ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
         ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.topOuttakeSpeed));
-        ControllerConstants.operatorController.leftTrigger().whileTrue(new IntakeAlgae(m_upperJaw, m_lowerJaw, JawConstants.intakeSpeed, JawConstants.intakeSpeed));
+        ControllerConstants.operatorController.leftTrigger().whileTrue(new IntakeAlgae(m_upperJaw, m_lowerJaw, .7, .7));
         ControllerConstants.operatorController.rightTrigger().whileTrue(new IntakeAlgae(m_upperJaw, m_lowerJaw, JawConstants.topOuttakeSpeed, JawConstants.bottomOuttakeSpeed));
 
-        ControllerConstants.operatorController.a().whileTrue(new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_1));
+       // ControllerConstants.operatorController.povUp().whileTrue( m_elevator.c_moveElevator(ElevatorConstants.manualSpeed));
+       // ControllerConstants.operatorController.povDown().whileTrue( m_elevator.c_moveElevator(-ElevatorConstants.manualSpeed));
+
+        ControllerConstants.operatorController.a().whileTrue(new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_1, 0, 0));
        // ControllerConstants.operatorController.a().whileTrue(LevelOne());
-        ControllerConstants.operatorController.b().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_2));
-        ControllerConstants.operatorController.y().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_3));
+        ControllerConstants.operatorController.b().whileTrue(new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_2, 0 ,0));
+        ControllerConstants.operatorController.y().whileTrue(new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_3, 0 ,0));
        // ControllerConstants.operatorController.x().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.LEVEL_4));
-        ControllerConstants.operatorController.x().whileTrue(m_elevator.c_goToSetPoint(Elevator.Level.CORAL_STATION));
-        ControllerConstants.operatorController.back().whileTrue(m_pivot.c_goToSetPoint(Elevator.Level.LEVEL_1));
+        ControllerConstants.operatorController.x().whileTrue(new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.CORAL_STATION, 0, 0));
+        ControllerConstants.operatorController.back().whileTrue(new BargeShot(m_pivot, m_upperJaw, m_lowerJaw));
+        ControllerConstants.operatorController.start().whileTrue(m_pivot.c_goToSetPoint(Elevator.Level.ALGAE, 1));
+        // ControllerConstants.operatorController.back().whileTrue(m_pivot.c_goToSetPoint(Elevator.Level.LEVEL_1));
 
         //ControllerConstants.operatorController.a().onTrue(new LevelSetPoints(m_elevator, ElevatorConstants.levelOneSetPoint));
     }
@@ -139,5 +153,6 @@ public class RobotContainer {
     public void onEnable(){
         m_pivot.resetPivotEncoder();
         m_elevator.resetEncoders();
+        m_climb.reset();
     }
 }
