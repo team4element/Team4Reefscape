@@ -357,7 +357,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void setSpeed(int speed) {
         if (m_speed.ordinal() + speed > SPEED.VERY_FAST.ordinal()) {
             m_speed = SPEED.SLOW;
-            
+
         } else if (m_speed.ordinal() + speed < SPEED.SLOW.ordinal()) {
             m_speed = SPEED.VERY_FAST;
         } else {
