@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Commands.AlgaeForBarge;
 import frc.robot.Commands.ApproachApriltag;
+import frc.robot.Commands.ApriltagAllignment;
+import frc.robot.Commands.AutoMove;
 import frc.robot.Commands.BargeShot;
 import frc.robot.Commands.ClimbDown;
 import frc.robot.Commands.ClimbUp;
@@ -32,6 +34,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.UpperJaw;
 import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.CommandSwerveDrivetrain.AutoMoveAction;
 import frc.robot.subsystems.Vision.Pipeline;
 import frc.robot.subsystems.LowerJaw;
 import frc.robot.subsystems.Pivot;
@@ -91,10 +94,11 @@ public class RobotContainer {
         m_pivot.setDefaultCommand(m_pivot.c_pivotManual());
         m_elevator.setDefaultCommand(m_elevator.c_moveElevator());
 
-
 	    //Driver Controls
         ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed, MaxAngularRate));
-        ControllerConstants.driverController.y().whileTrue(new ApproachApriltag(drivetrain, m_vision, 3.0));
+        ControllerConstants.driverController.y().whileTrue(new ApproachApriltag(drivetrain, m_vision, 0.5));
+        ControllerConstants.driverController.a().whileTrue(new ApriltagAllignment(drivetrain, m_vision, 0.5, ControllerConstants.driverController, MaxSpeed, MaxSpeed));
+        ControllerConstants.driverController.b().whileTrue(new AutoMove(drivetrain, m_vision, AutoMoveAction.MOVE_VERTICAL));
 
         ControllerConstants.driverController.leftBumper().onTrue(drivetrain.c_seedFieldRelative());
         ControllerConstants.driverController.leftTrigger().whileTrue(new ClimbDown(m_climb, 1));

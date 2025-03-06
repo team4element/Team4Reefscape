@@ -24,6 +24,7 @@ public class Vision extends SubsystemBase {
     CENTER,
     LEFT_PIPE,
     RIGHT_PIPE,
+    THREE_DIMENSIONAL
   }
 
   public Vision() {
@@ -39,6 +40,8 @@ public class Vision extends SubsystemBase {
       // calculate distance
       lastKnownTargetDistanceInches = (VisionConstants.goalHeightInches - VisionConstants.limelightLensHeightInches)
           / Math.tan(angleToGoalRadians);
+
+      System.out.println(currentPipeline());
     }
   }
 
