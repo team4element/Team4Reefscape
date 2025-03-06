@@ -91,29 +91,22 @@ public class RobotContainer {
         m_pivot.setDefaultCommand(m_pivot.c_pivotManual());
         m_elevator.setDefaultCommand(m_elevator.c_moveElevator());
 
+
+	    //Driver Controls
         ControllerConstants.driverController.x().whileTrue(new HoldAngle(drivetrain, m_vision, ControllerConstants.driverController, MaxSpeed, MaxAngularRate));
         ControllerConstants.driverController.y().whileTrue(new ApproachApriltag(drivetrain, m_vision, 3.0));
-        
-        ControllerConstants.driverController.povLeft().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.LEFT_PIPE));
-        ControllerConstants.driverController.povRight().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.RIGHT_PIPE));
-       
+
         ControllerConstants.driverController.leftBumper().onTrue(drivetrain.c_seedFieldRelative());
-        ControllerConstants.driverController.povUp().onTrue(new Vision().c_ChangePipeline(1));
-        ControllerConstants.driverController.povDown().onTrue(new Vision().c_ChangePipeline(-1));
         ControllerConstants.driverController.leftTrigger().whileTrue(new ClimbDown(m_climb, 1));
-         ControllerConstants.driverController.rightTrigger().whileTrue(new ClimbUp(m_climb, 1));
+        ControllerConstants.driverController.rightTrigger().whileTrue(new ClimbUp(m_climb, 1));
 
-        
-
-	//Driver Controls
-        // reset the field-centric heading on left bumper press
-        ControllerConstants.driverController.leftBumper().whileTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-        drivetrain.registerTelemetry(logger::telemeterize);
         ControllerConstants.driverController.start().onTrue(drivetrain.c_updateSpeed(1));
         ControllerConstants.driverController.back().onTrue(drivetrain.c_updateSpeed(-1));
-        ControllerConstants.driverController.pov(270).onTrue(m_vision.c_ChangePipeline(Pipeline.LEFT_PIPE));
-        ControllerConstants.driverController.pov(90).onTrue(m_vision.c_ChangePipeline(Pipeline.RIGHT_PIPE));
-        ControllerConstants.driverController.pov(180).onTrue(m_vision.c_ChangePipeline(Pipeline.CENTER));
+
+        ControllerConstants.driverController.povLeft().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.LEFT_PIPE));
+        ControllerConstants.driverController.povRight().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.RIGHT_PIPE));
+        ControllerConstants.driverController.povUp().onTrue(new Vision().c_ChangePipeline(1));
+        ControllerConstants.driverController.povDown().onTrue(new Vision().c_ChangePipeline(-1));
 
         //Operator Controls
         ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
@@ -125,6 +118,7 @@ public class RobotContainer {
         ControllerConstants.operatorController.b().whileTrue(new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_2, 0 ,0));
         ControllerConstants.operatorController.y().whileTrue(new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_3, 0 ,0));
         ControllerConstants.operatorController.x().whileTrue(new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.CORAL_STATION, 0, 0));
+        
         ControllerConstants.operatorController.back().whileTrue(new BargeShot(m_pivot, m_upperJaw, m_lowerJaw));
         ControllerConstants.operatorController.start().whileTrue(m_pivot.c_goToSetPoint(Elevator.Level.ALGAE, 1));
 
