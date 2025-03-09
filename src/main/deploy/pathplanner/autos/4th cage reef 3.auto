@@ -13,13 +13,19 @@
         {
           "type": "named",
           "data": {
-            "name": "elevator level 2"
+            "name": "level 2"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "outtake coral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "level 1"
           }
         },
         {

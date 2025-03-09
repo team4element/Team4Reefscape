@@ -43,19 +43,19 @@ public class Climb extends SubsystemBase{
         configurator.apply(m_limitConfig);
     }
     public void runMotorUp(double speed){
-        if (m_climb.getPosition().getValueAsDouble() <= 2.7){
-            m_climb.setControl(m_dutyCycle.withOutput(0));
-        } else {
+       // if (m_climb.getPosition().getValueAsDouble() <= 2.7){
+          //  m_climb.setControl(m_dutyCycle.withOutput(0));
+      //  } else {
             m_climb.setControl(m_dutyCycle.withOutput(-speed));
-        }
+      //  }
     }
 
     public void runMotorDown(double speed){
-       if(m_climb.getPosition().getValueAsDouble() >= 58) {
-            m_climb.setControl(m_dutyCycle.withOutput(0));
-        } else {
+     //  if(m_climb.getPosition().getValueAsDouble() >= 58) {
+       //     m_climb.setControl(m_dutyCycle.withOutput(0));
+     //   } else {
             m_climb.setControl(m_dutyCycle.withOutput(speed));
-        }
+     //   }
     }
     public void motorOff(){
         m_climb.setControl(m_dutyCycle.withOutput(0));

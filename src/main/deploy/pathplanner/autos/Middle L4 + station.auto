@@ -7,19 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Middle"
+            "pathName": "Middle coral"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "elevator level 1"
+            "name": "level 4"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "outtake coral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "level 1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "reef 2 to station"
           }
         }
       ]

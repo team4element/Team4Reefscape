@@ -108,6 +108,10 @@ public class Elevator extends SubsystemBase {
         m_hold_value = m_leftLeader.getPosition().getValueAsDouble();
     }
 
+    public void resetHold(){
+        m_hold_value = m_leftLeader.getPosition().getValueAsDouble();
+    }
+
     public void holdEnd() {
         m_leftLeader.set(0);
         m_leftLeader.setNeutralMode(NeutralModeValue.Brake);
@@ -140,7 +144,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command c_moveElevator() {
-        return Commands.run(() -> setMotors(my_deadband(-ControllerConstants.operatorController.getRightY()) * .5), this);
+        return Commands.run(() -> setMotors(my_deadband(-ControllerConstants.operatorController.getRightY()) * .7), this);
     }
 
     @Override
@@ -153,7 +157,7 @@ public class Elevator extends SubsystemBase {
             case LEVEL_1: return 2.3;
             case LEVEL_2: return 3.6;
             case LEVEL_3: return 5.6;
-            case LEVEL_4: return 7.3;
+            case LEVEL_4: return 7.6;
             case CORAL_STATION: return 3.7;
         }
 

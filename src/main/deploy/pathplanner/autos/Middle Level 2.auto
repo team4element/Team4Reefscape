@@ -7,13 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Middle coral"
+            "pathName": "Center Middle"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "elevator level 3"
+            "name": "level 3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "reef 2 shift"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "level 2"
           }
         },
         {

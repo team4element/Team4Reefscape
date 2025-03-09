@@ -23,6 +23,7 @@ import frc.robot.Commands.ClimbUp;
 import frc.robot.Commands.ElevateAndPivot;
 import frc.robot.Commands.HoldAngle;
 import frc.robot.Commands.IntakeAlgae;
+import frc.robot.Commands.MovingToBarge;
 import frc.robot.Commands.Shift;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.ElevatorConstants;
@@ -69,8 +70,10 @@ public class RobotContainer {
         NamedCommands.registerCommand("level 1", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_1, 0, 0).withTimeout(1));
         NamedCommands.registerCommand("level 2", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_2, 0, 0).withTimeout(1));
         NamedCommands.registerCommand("level 3", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_3, 0, 0).withTimeout(1));
-        NamedCommands.registerCommand("outtake coral", m_lowerJaw.c_intakeCoral(JawConstants.topOuttakeSpeed).withTimeout(1));
+        NamedCommands.registerCommand("level 4", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_4, 0, 0).withTimeout(1));
+        NamedCommands.registerCommand("outtake coral", m_lowerJaw.c_intakeCoral(-0.18).withTimeout(1));
         NamedCommands.registerCommand("Lower elevator", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_1, 1, 0).withTimeout(1.5));
+        NamedCommands.registerCommand("Intake Algae", new IntakeAlgae(m_upperJaw, m_lowerJaw, 0.7, 0.7));
         // creates a menu on shuffle board for autons
         sendableAuton = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", sendableAuton);
@@ -101,8 +104,8 @@ public class RobotContainer {
         ControllerConstants.driverController.b().whileTrue(new AutoMove(drivetrain, m_vision, AutoMoveAction.MOVE_VERTICAL));
 
         ControllerConstants.driverController.leftBumper().onTrue(drivetrain.c_seedFieldRelative());
-        ControllerConstants.driverController.leftTrigger().whileTrue(new ClimbDown(m_climb, 1));
-        ControllerConstants.driverController.rightTrigger().whileTrue(new ClimbUp(m_climb, 1));
+      //  ControllerConstants.driverController.leftTrigger().whileTrue(new ClimbDown(m_climb, 1));
+      // ControllerConstants.driverController.rightTrigger().whileTrue(new ClimbUp(m_climb, 1));
 
         ControllerConstants.driverController.start().onTrue(drivetrain.c_updateSpeed(1));
         ControllerConstants.driverController.back().onTrue(drivetrain.c_updateSpeed(-1));
@@ -124,6 +127,7 @@ public class RobotContainer {
         ControllerConstants.operatorController.x().whileTrue(new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.CORAL_STATION, 0, 0));
         
         ControllerConstants.operatorController.back().whileTrue(new BargeShot(m_pivot, m_upperJaw, m_lowerJaw));
+      //  ControllerConstants.operatorController.back().whileTrue(new MovingToBarge(m_elevator, m_pivot, m_upperJaw, m_lowerJaw));
         ControllerConstants.operatorController.start().whileTrue(m_pivot.c_goToSetPoint(Elevator.Level.ALGAE, 1));
 
     }
