@@ -9,6 +9,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision;
@@ -43,6 +44,11 @@ public class Shift extends Command {
     addRequirements(drive_train, vision);
   }
 
+  public Shift(CommandSwerveDrivetrain drivetrain, Vision vision, CommandXboxController controller,
+      double rotationalSpeed, double translationalSpeed) {
+    //TODO Auto-generated constructor stub
+  }
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
@@ -56,8 +62,18 @@ public class Shift extends Command {
   public void execute() {
     //testing horizontal movement (in progress and might change back to angular movement)
     if (m_vision.hasTarget() && m_threshold < Math.abs(m_vision.getVerticalOffset())) { // + 1.85
+      if(m_vision.currentPipeline().ordinal() == 1){
         m_drive_train.setControl(
-          m_drive.withVelocityY(m_pid.calculate(m_vision.getVerticalOffset() + 1.2 * m_max_speed))); // +2.2
+          m_drive.withVelocityY(m_pid.calculate(m_vision.getVerticalOffset() - .8 * m_max_speed))); // +2.2
+          }
+        else if(m_vision.currentPipeline().ordinal() == 2){
+          m_drive_train.setControl(
+            m_drive.withVelocityY(m_pid.calculate(m_vision.getVerticalOffset() + .5 * m_max_speed)));
+        }
+        else {
+          m_drive_train.setControl(
+            m_drive.withVelocityY(m_pid.calculate(m_vision.getVerticalOffset() * m_max_speed)));
+        }
     }else{
         m_is_finished = true;
     }

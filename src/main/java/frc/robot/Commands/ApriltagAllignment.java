@@ -4,7 +4,6 @@
 
 package frc.robot.Commands;
 
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -18,6 +17,6 @@ public class ApriltagAllignment extends SequentialCommandGroup {
   public ApriltagAllignment(CommandSwerveDrivetrain drivetrain, Vision vision, double speed, CommandXboxController controller, double rotationalSpeed, double translationalSpeed) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new HoldAngle(drivetrain, vision, controller, rotationalSpeed, translationalSpeed), new ApproachApriltag(drivetrain, vision, speed));
+    addCommands(new Shift(drivetrain, vision, controller, rotationalSpeed, translationalSpeed), new ApproachApriltag(drivetrain, vision, speed));
   }
 }

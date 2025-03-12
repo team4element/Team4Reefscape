@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Commands.HoldAngle;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -144,7 +143,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command c_moveElevator() {
-        return Commands.run(() -> setMotors(my_deadband(-ControllerConstants.operatorController.getRightY()) * .7), this);
+        return Commands.run(() -> setMotors(my_deadband(-ControllerConstants.operatorController.getRightY()) * .9), this);
     }
 
     @Override
