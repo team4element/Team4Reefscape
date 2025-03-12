@@ -21,18 +21,6 @@
           "data": {
             "name": "outtake coral"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "level 1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "reef 1 to end field"
-          }
         }
       ]
     }

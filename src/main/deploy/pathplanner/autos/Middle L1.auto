@@ -7,19 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2nd cage to reef 1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "level 2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "outtake coral"
+            "pathName": "Middle"
           }
         },
         {
@@ -29,9 +17,9 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "reef 1 to end field"
+            "name": "outtake coral"
           }
         }
       ]
