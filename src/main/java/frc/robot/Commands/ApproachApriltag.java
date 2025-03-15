@@ -1,6 +1,7 @@
 package frc.robot.Commands;
 
 
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -18,7 +19,7 @@ public class ApproachApriltag extends Command{
     CommandSwerveDrivetrain m_drivetrain;
     Vision m_limelight;
 
-    SwerveRequest.RobotCentric m_drive;
+    SwerveRequest.FieldCentric m_drive;
     double m_speed;
     PIDController m_pid;
     boolean m_is_finished;
@@ -26,17 +27,20 @@ public class ApproachApriltag extends Command{
     Pose2d initialPose;
     Pose2d currentPose;
     double PValue;
+    PositionVoltage m_x_request;
+    PositionVoltage m_y_request;
+    PositionVoltage m_rot_request;
+
 
     public ApproachApriltag(CommandSwerveDrivetrain drivetrain, Vision limelight, double speed){
-      
       m_drivetrain = drivetrain;
       m_limelight = limelight;
-
       m_speed = speed;
+      m_x_request = new PositionVoltage(0).withSlot(0).withVelocity(.2);
+      m_y_request = new PositionVoltage(0).withSlot(0).withVelocity(.2);
+      m_rot_request = new PositionVoltage(0).withSlot(0).withVelocity(.2);
 
-      m_pid = new PIDController(VisionConstants.ApproachApriltag_P, VisionConstants.ApproachApriltag_I, VisionConstants.ApproachApriltag_D); //TODO better tune
-
-        m_drive = new SwerveRequest.RobotCentric()
+      m_drive = new SwerveRequest.FieldCentric()
       .withDeadband(VisionConstants.deadband)
       .withRotationalDeadband(VisionConstants.rotationalDeadband)
       .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
@@ -64,10 +68,12 @@ public class ApproachApriltag extends Command{
     // then have the drivetrain move using the limelight's distance to the apriltag
     double distance = Math.sqrt(Math.pow(currentPose.getX() - initialPose.getX(), 2) + Math.pow(currentPose.getY() - initialPose.getY(), 2));
     double distanceLeftover = (m_limelight.lastKnownTargetDistanceInches / VisionConstants.inchesToMeters) - distance + VisionConstants.inaccuracy;
-    if (!m_limelight.hasTarget() && distanceLeftover > 0.02) {
-        m_drivetrain.setControl(
-          m_drive
-          .withVelocityX(-m_pid.calculate(distanceLeftover) * m_speed));
+    if (m_limelight.hasTarget()|| distanceLeftover < 0.02) {
+      m_drivetrain.setControl(
+        m_drive
+        .withVelocityX(m_x_request.withPosition(Math.sqrt(Math.pow(currentPose.getX() - initialPose.getX(), 2))).withSlot(0).Velocity)
+        .withVelocityY(m_y_request.withPosition(Math.sqrt(Math.pow(currentPose.getY() - initialPose.getY(), 2))).withSlot(0).Velocity)
+        .withRotationalRate(m_rot_request.withPosition(currentPose.getRotation().getMeasure()).withSlot(0).Velocity));
     }else{
         m_is_finished = true;
     }
