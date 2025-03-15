@@ -68,11 +68,11 @@ public class ApproachApriltag extends Command{
     // then have the drivetrain move using the limelight's distance to the apriltag
     double distance = Math.sqrt(Math.pow(currentPose.getX() - initialPose.getX(), 2) + Math.pow(currentPose.getY() - initialPose.getY(), 2));
     double distanceLeftover = (m_limelight.lastKnownTargetDistanceInches / VisionConstants.inchesToMeters) - distance + VisionConstants.inaccuracy;
-    if (m_limelight.hasTarget()|| distanceLeftover < 0.02) {
+    if (m_limelight.hasTarget() || distanceLeftover < 0.02) {
       m_drivetrain.setControl(
         m_drive
-        .withVelocityX(m_x_request.withPosition(Math.sqrt(Math.pow(currentPose.getX() - initialPose.getX(), 2))).withSlot(0).Velocity)
-        .withVelocityY(m_y_request.withPosition(Math.sqrt(Math.pow(currentPose.getY() - initialPose.getY(), 2))).withSlot(0).Velocity)
+        .withVelocityX(m_x_request.withPosition(m_limelight.getVerticalOffset()).withSlot(0).Velocity)
+        .withVelocityY(m_y_request.withPosition(m_limelight.getHorizontalOffset()).withSlot(0).Velocity)
         .withRotationalRate(m_rot_request.withPosition(currentPose.getRotation().getMeasure()).withSlot(0).Velocity));
     }else{
         m_is_finished = true;
