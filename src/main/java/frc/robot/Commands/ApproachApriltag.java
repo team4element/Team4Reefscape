@@ -2,6 +2,7 @@ package frc.robot.Commands;
 
 
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -9,6 +10,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.LimelightHelpers;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision;
@@ -22,23 +24,22 @@ public class ApproachApriltag extends Command{
     SwerveRequest.FieldCentric m_drive;
     double m_speed;
     PIDController m_pid;
+    PIDController m_rotationPidController;
     boolean m_is_finished;
     DriveRequestType driveRequest;
     Pose2d initialPose;
     Pose2d currentPose;
     double PValue;
-    PositionVoltage m_x_request;
-    PositionVoltage m_y_request;
-    PositionVoltage m_rot_request;
+
 
 
     public ApproachApriltag(CommandSwerveDrivetrain drivetrain, Vision limelight, double speed){
       m_drivetrain = drivetrain;
       m_limelight = limelight;
       m_speed = speed;
-      m_x_request = new PositionVoltage(0).withSlot(0).withVelocity(.2);
-      m_y_request = new PositionVoltage(0).withSlot(0).withVelocity(.2);
-      m_rot_request = new PositionVoltage(0).withSlot(0).withVelocity(.2);
+
+      m_pid = new PIDController(0, 0, 0);
+      m_rotationPidController = new PIDController(0, 0, 0);
 
       m_drive = new SwerveRequest.FieldCentric()
       .withDeadband(VisionConstants.deadband)
@@ -56,29 +57,28 @@ public class ApproachApriltag extends Command{
     m_limelight.switchPipeline(Pipeline.CENTER);
     m_is_finished = false;
     initialPose = m_drivetrain.getState().Pose;
+    initialPose = LimelightHelpers.getBotPose2d("");
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
 
-    currentPose = m_drivetrain.getState().Pose;
+    currentPose = LimelightHelpers.getTargetPose3d_RobotSpace("").toPose2d();
+
 
     //if the limelight doesn't not see a target and the distance formula is positive
     // then have the drivetrain move using the limelight's distance to the apriltag
-    double distance = Math.sqrt(Math.pow(currentPose.getX() - initialPose.getX(), 2) + Math.pow(currentPose.getY() - initialPose.getY(), 2));
-    double distanceLeftover = (m_limelight.lastKnownTargetDistanceInches / VisionConstants.inchesToMeters) - distance + VisionConstants.inaccuracy;
-    if (m_limelight.hasTarget() || distanceLeftover < 0.02) {
+    if (m_limelight.hasTarget()) {
       m_drivetrain.setControl(
         m_drive
-        .withVelocityX(m_x_request.withPosition(m_limelight.getVerticalOffset()).withSlot(0).Velocity)
-        .withVelocityY(m_y_request.withPosition(m_limelight.getHorizontalOffset()).withSlot(0).Velocity)
-        .withRotationalRate(m_rot_request.withPosition(currentPose.getRotation().getMeasure()).withSlot(0).Velocity));
+        .withVelocityX(m_pid.calculate(currentPose.getX() - initialPose.getX()))
+        .withVelocityY(m_pid.calculate(currentPose.getY() - initialPose.getY()))
+        .withRotationalRate(m_rotationPidController.calculate(currentPose.getRotation().getDegrees() - initialPose.getRotation().getDegrees())));
     }else{
         m_is_finished = true;
     }
-
-     System.out.println(distanceLeftover);
   }
 
   // Called once the command ends or is interrupted.
