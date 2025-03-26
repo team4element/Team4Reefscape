@@ -6,5 +6,6 @@ package frc.robot.Constants;
 
 /** Add your docs here. */
 public class ClimbConstants {
-    public static final int climbID = 0;
+    public static final int climbID = 19;
+    public static final int leftID = 20;
 }
