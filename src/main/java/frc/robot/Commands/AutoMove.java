@@ -23,7 +23,7 @@ public class AutoMove extends Command {
 
   private CommandSwerveDrivetrain m_drive_train;
   private Vision m_vision;
-  private SwerveRequest.FieldCentric m_drive;
+  private SwerveRequest.RobotCentric m_drive;
   private double m_threshold;
   private boolean m_is_finished;
   private PIDController m_pid;
@@ -37,7 +37,7 @@ public class AutoMove extends Command {
 
     m_pid = new PIDController(VisionConstants.AutoMove_P, VisionConstants.AutoMove_I, VisionConstants.AutoMove_D);
 
-    m_drive = new SwerveRequest.FieldCentric()
+    m_drive = new SwerveRequest.RobotCentric()
       .withDeadband(VisionConstants.deadband)
       .withRotationalDeadband(VisionConstants.rotationalDeadband)
       .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
@@ -63,10 +63,15 @@ public class AutoMove extends Command {
           m_threshold = ShuffleboardHelper.getInstance().getHorizontalThreshold();
           m_threshold = 1.0;
           break;
-        case MOVE_VERTICAL:
-          m_vision.switchPipeline(Vision.Pipeline.THREE_DIMENSIONAL);
-          m_vertical_speed = VisionConstants.verticalSpeed;
-          m_threshold = 0.5;
+        case MOVE_VERTICAL_LEFT:
+          m_vision.switchPipeline(Vision.Pipeline.LEFT_PIPE);
+          m_vertical_speed = -VisionConstants.verticalSpeed;
+          m_threshold = 0.2;
+          break;
+          case MOVE_VERTICAL_RIGHT:
+          m_vision.switchPipeline(Vision.Pipeline.RIGHT_PIPE);
+          m_vertical_speed = -VisionConstants.verticalSpeed;
+          m_threshold = 0.2;
           break;
         default: break;
       }
@@ -77,11 +82,13 @@ public class AutoMove extends Command {
   @Override
   public void execute() {
     double offset = 0;
+    double horizontalOffset = 0;
 
     switch (m_action) {
       case MOVE_HORIZONTAL: offset = m_vision.getVerticalOffset(); break; //fallthrough
       case TURN_IN_PLACE: offset = m_vision.getHorizontalOffset(); break;
-      case MOVE_VERTICAL: offset = m_vision.getTarget3DPose().getZ() * -1;
+      case MOVE_VERTICAL_LEFT: offset = m_vision.getTarget3DPose().getZ(); horizontalOffset = m_vision.getTarget3DPose().getX();
+      case MOVE_VERTICAL_RIGHT: offset = m_vision.getTarget3DPose().getZ(); horizontalOffset = m_vision.getTarget3DPose().getX();
         // System.out.printf("\r\n X: %f, Y: %f, Z: %f", m_vision.getTarget3DPose().getX(), m_vision.getTarget3DPose().getY(), m_vision.getTarget3DPose().getZ());
       break;
       default: break;
@@ -93,22 +100,23 @@ public class AutoMove extends Command {
       if (offset < -m_threshold) {
         m_drive_train.setControl(
             m_drive
-              .withRotationalRate(m_pid.calculate(m_vision.getVerticalOffset()) * m_rotation_speed)
-              .withVelocityX(m_vertical_speed * -1)
-              .withVelocityY(m_horizontal_speed * -1));
+              .withRotationalRate(-m_pid.calculate(m_vision.getVerticalOffset()) * m_rotation_speed)
+              .withVelocityX( -m_vertical_speed * -1)
+              .withVelocityY(m_pid.calculate(m_vision.getVerticalOffset() *m_horizontal_speed * -1)));
       } else if (offset > m_threshold) {
         m_drive_train.setControl(
           m_drive
-          .withRotationalRate(m_pid.calculate(m_vision.getVerticalOffset()) * m_rotation_speed)
-          .withVelocityX(m_vertical_speed)
-          .withVelocityY(m_horizontal_speed));
+          .withRotationalRate(-m_pid.calculate(m_vision.getVerticalOffset()) * m_rotation_speed)
+          .withVelocityX( m_vertical_speed)
+          .withVelocityY(m_pid.calculate(m_vision.getVerticalOffset() * m_horizontal_speed)));
       }else{
         m_is_finished = true;
       }
-    }else{
-      m_is_finished = true;
-    }
-  }
+          }else{
+            m_is_finished = true;
+          }
+      }
+   
 
   // Called once the command ends or is interrupted.
   @Override

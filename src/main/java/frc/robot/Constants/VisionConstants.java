@@ -22,7 +22,7 @@ public class VisionConstants {
     public static double Shift_D = 0.0005;
 
     //constants for HoldAngle command
-    public static double HoldAngle_P = 0.005;
+    public static double HoldAngle_P = 0.01;
     public static double HoldAngle_I = 0;
     public static double HoldAngle_D = .0000001;
 
@@ -33,7 +33,7 @@ public class VisionConstants {
 
     public static double turningSpeed = 0.5;
     public static double horizontalSpeed = 1.5;
-    public static double verticalSpeed = -1.5;
+    public static double verticalSpeed = -.5;
 
     //constants for ApproachApriltag command
     public static double ApproachApriltag_P = 0.9;

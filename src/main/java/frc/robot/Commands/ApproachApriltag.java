@@ -31,15 +31,13 @@ public class ApproachApriltag extends Command{
     Pose2d currentPose;
     double PValue;
 
-
-
     public ApproachApriltag(CommandSwerveDrivetrain drivetrain, Vision limelight, double speed){
       m_drivetrain = drivetrain;
       m_limelight = limelight;
       m_speed = speed;
 
-      m_pid = new PIDController(0, 0, 0);
-      m_rotationPidController = new PIDController(0, 0, 0);
+      m_pid = new PIDController(.5, 0, 0);
+      m_rotationPidController = new PIDController(.5, 0, 0);
 
       m_drive = new SwerveRequest.FieldCentric()
       .withDeadband(VisionConstants.deadband)

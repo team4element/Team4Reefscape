@@ -4,16 +4,24 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.Utils;
+
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.LimelightHelpers.LimelightResults;
+import frc.robot.LimelightHelpers.PoseEstimate;
 
 public class Vision extends SubsystemBase {
 
   public double lastKnownTargetDistanceInches;
+  private CommandSwerveDrivetrain drivetrain=null;
+  PoseEstimate measurement;
 
   public enum LedState {
     ON,
@@ -28,16 +36,26 @@ public class Vision extends SubsystemBase {
     THREE_DIMENSIONAL
   }
 
-  public Vision() {
-    switchPipeline(Pipeline.CENTER);
+  public Vision(CommandSwerveDrivetrain drivetrain) {
+    switchPipeline(Pipeline.THREE_DIMENSIONAL);
+    this.drivetrain=drivetrain;
   }
 
-  @Override
-  public void periodic() {
+  public void doPeriodically(){
     if (hasTarget()) {
       double angleToGoalDegrees = VisionConstants.limelightMountAngleDegrees + getVerticalOffset();
       double angleToGoalRadians = angleToGoalDegrees * VisionConstants.radianMeasurement;
+      
+      double heading=drivetrain.getState().Pose.getRotation().getDegrees();
+      LimelightHelpers.SetRobotOrientation("", heading, 0, 0, 0, 0, 0);
+      measurement=LimelightHelpers.getBotPoseEstimate_wpiBlue("");
 
+      if(measurement!=null){
+        if(measurement.pose.getX()!=0&&measurement.pose.getY()!=0&&measurement.avgTagDist<2.5){
+          drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(0.1*Math.pow(measurement.avgTagDist,2),0.1*Math.pow(measurement.avgTagDist,2),0.1*Math.pow(measurement.avgTagDist,2)));
+          drivetrain.addVisionMeasurement(measurement.pose, Utils.fpgaToCurrentTime(measurement.timestampSeconds));
+        }
+      }
       // calculate distance
       lastKnownTargetDistanceInches = (VisionConstants.goalHeightInches - VisionConstants.limelightLensHeightInches)
           / Math.tan(angleToGoalRadians);
@@ -45,6 +63,12 @@ public class Vision extends SubsystemBase {
       System.out.println(currentPipeline());
     }
   }
+
+  @Override
+  public void periodic() {
+    doPeriodically();
+  }
+
 
   /**
    * Controls the LED on the limelight
@@ -66,6 +90,10 @@ public class Vision extends SubsystemBase {
         LimelightHelpers.setLEDMode_ForceOff("");
         break;
     }
+  }
+
+  public PoseEstimate getMeasurement(){
+    return measurement;
   }
 
   /**
@@ -92,6 +120,11 @@ public class Vision extends SubsystemBase {
     int index = (int)LimelightHelpers.getCurrentPipelineIndex("");
     return Pipeline.values()[index];
   }
+
+  // public Pose3d toPose3d(){
+  //   Pose3d pose = new LimelightHelpers.toPose3D("");
+  //   return pose;
+  // }
 
   public double getHorizontalOffset() {
     return LimelightHelpers.getTX("");

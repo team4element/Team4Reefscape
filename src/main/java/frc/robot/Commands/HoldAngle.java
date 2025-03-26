@@ -8,12 +8,16 @@ import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.LimelightHelpers;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.LimelightHelpers.LimelightResults;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Vision.Pipeline;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class HoldAngle extends Command {
@@ -42,6 +46,7 @@ public class HoldAngle extends Command {
       .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
       .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo);
 
+    m_vision.switchPipeline(Pipeline.CENTER);
     addRequirements(drive_train, vision);
   }
 
@@ -56,9 +61,10 @@ public class HoldAngle extends Command {
   public void execute() {
     //testing horizontal movement (in progress and might change back to angular movement)
     if (m_vision.hasTarget()) {
+        SmartDashboard.putNumber("x", m_vision.getVerticalOffset() * 2 * m_max_angle_rate);
         m_drive_train.setControl(
           m_drive
-          .withRotationalRate(m_pid.calculate(m_vision.getVerticalOffset()) * m_max_angle_rate)
+          .withRotationalRate(m_pid.calculate(m_vision.getVerticalOffset() * m_max_angle_rate))
           .withVelocityX(-m_controller.getLeftY() * m_max_speed)
           .withVelocityY(-m_controller.getLeftX() * m_max_speed));
     }else{
@@ -69,7 +75,9 @@ public class HoldAngle extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-      
+    m_vision.switchPipeline(Pipeline.THREE_DIMENSIONAL);
+
+
   }
 
   // Returns true when the command should end.

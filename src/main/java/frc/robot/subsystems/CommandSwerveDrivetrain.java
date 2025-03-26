@@ -36,7 +36,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public enum AutoMoveAction {
         TURN_IN_PLACE,
         MOVE_HORIZONTAL,
-        MOVE_VERTICAL
+        MOVE_VERTICAL_LEFT,
+        MOVE_VERTICAL_RIGHT
     };
 
     public enum SPEED {
