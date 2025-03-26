@@ -101,6 +101,10 @@ public class Elevator extends SubsystemBase {
         }
     }
 
+    public void runMotors(double speed){
+        m_leftLeader.setControl(m_leftDutyCycle.withOutput(speed));
+    }
+
     public void motorOff(TalonFX motor) {
         motor.set(0);
         motor.setNeutralMode(NeutralModeValue.Brake);
@@ -153,7 +157,7 @@ public class Elevator extends SubsystemBase {
 
     public double goToLevel(Level level){
         switch(level){
-            case LEVEL_1: return 2.3;
+            case LEVEL_1: return 2.38;
             case LEVEL_2: return 3.6;
             case LEVEL_3: return 5.6;
             case LEVEL_4: return 7.6;
@@ -168,13 +172,13 @@ public class Elevator extends SubsystemBase {
         m_rightFollower.setPosition(0);
     }
 
-    public Command c_hold() {
-        // If our elevator is below LEVEL_1 don't continue to run the motor
-        if (m_hold_value > levelToSetPoint(Level.LEVEL_1)) {
-            return startEnd(() -> goToSetPoint(m_hold_value, 0), () -> holdEnd());
-        }
-        return startEnd( ()-> holdEnd(), () -> holdEnd());
-    }
+    // public Command c_hold() {
+    //     // If our elevator is below LEVEL_1 don't continue to run the motor
+    //     if (m_hold_value > levelToSetPoint(Level.LEVEL_1)) {
+    //         return startEnd(() -> goToSetPoint(m_hold_value, 0), () -> holdEnd());
+    //     }
+    //     return startEnd( ()-> holdEnd(), () -> holdEnd());
+    // }
 
     public double levelToSetPoint(Level level) {
         switch (level) {
