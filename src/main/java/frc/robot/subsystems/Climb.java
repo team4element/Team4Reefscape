@@ -111,4 +111,8 @@ public class Climb extends SubsystemBase{
   public Command c_pivotNegative(double speed){
     return Commands.startEnd(() -> runMotorDown(speed), () -> motorOff());
 }
+  public Command c_horizontal(double setpoint, double goal){
+    return Commands.startEnd(() -> goToSetPoint(setpoint, goal), () -> motorOff());
+  }
+
 }

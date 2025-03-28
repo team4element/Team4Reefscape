@@ -27,7 +27,7 @@ public class VisionConstants {
     public static double HoldAngle_D = .0000001;
 
     //constants for AutoMove command
-    public static double AutoMove_P = 0.3;
+    public static double AutoMove_P = 0.3; //0.3
     public static double AutoMove_I = 0;
     public static double AutoMove_D = 0.003;
 

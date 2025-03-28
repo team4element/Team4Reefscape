@@ -52,7 +52,7 @@ public class Vision extends SubsystemBase {
 
       if(measurement!=null){
         if(measurement.pose.getX()!=0&&measurement.pose.getY()!=0&&measurement.avgTagDist<2.5){
-          drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(0.1*Math.pow(measurement.avgTagDist,2),0.1*Math.pow(measurement.avgTagDist,2),0.1*Math.pow(measurement.avgTagDist,2)));
+          drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(0.1*Math.pow(measurement.avgTagDist,2),0.1*Math.pow(measurement.avgTagDist,2),9999999999.0));
           drivetrain.addVisionMeasurement(measurement.pose, Utils.fpgaToCurrentTime(measurement.timestampSeconds));
         }
       }

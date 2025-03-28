@@ -15,6 +15,8 @@ public class LowerJaw extends UpperJaw {
     private DutyCycleOut m_outerControlRequest;
     private MotorOutputConfigs currentConfigs;
 
+    CommandSwerveDrivetrain m_drivetrain;
+
     public static enum LowerJawAction {
         INTAKE_CORAL,
         OUTTAKE_CORAL,
