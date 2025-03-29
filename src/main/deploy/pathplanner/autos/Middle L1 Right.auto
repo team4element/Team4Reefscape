@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "1st cage to reef 6 coral"
+            "pathName": "Middle RIght"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "elevator level 1"
+            "name": "level 1"
           }
         },
         {
@@ -21,17 +21,11 @@
           "data": {
             "name": "outtake coral"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "reef 6 to end field"
-          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Reef 6",
+  "folder": null,
   "choreoAuto": false
 }
