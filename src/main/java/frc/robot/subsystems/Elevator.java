@@ -157,11 +157,11 @@ public class Elevator extends SubsystemBase {
 
     public double goToLevel(Level level){
         switch(level){
-            case LEVEL_1: return 1.2;
-            case LEVEL_2: return 3.6;
+            case LEVEL_1: return 1.5;
+            case LEVEL_2: return 3.65;
             case LEVEL_3: return 5.6;
             case LEVEL_4: return 7.6;
-            case CORAL_STATION: return 3.7;
+            case CORAL_STATION: return 3.65;
         }
 
         return 3;
@@ -183,15 +183,15 @@ public class Elevator extends SubsystemBase {
     public double levelToSetPoint(Level level) {
         switch (level) {
             case LEVEL_1:
-                return 1.2;
+                return 1.5;
             case LEVEL_2:
-                return 3.6;
+                return 3.65;
             case LEVEL_3:
                 return 5.6;
             case LEVEL_4:
                 return 7.3;
             case CORAL_STATION:
-                return 3.5;
+                return 3.65;
         }
         return 3;
     }
