@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -363,6 +364,47 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 return 1;
         }
         return 1;
+    }
+
+    public enum coralStation{
+        BLUELEFT,
+        BLUERIGHT,
+        REDLEFT,
+        REDRIGHT
+      }
+
+    public double targetPose(coralStation coralStation){
+        switch(coralStation){
+            case BLUELEFT: return 54;
+            case BLUERIGHT: return -36;
+            case REDLEFT: return 144;
+            case REDRIGHT: return -126;
+        }
+
+        return 54;
+    }
+
+    public Alliance getAlliance(){
+        Optional<Alliance> ally = DriverStation.getAlliance();
+        if (ally.isPresent()) {
+            if (ally.get() == Alliance.Red){
+                System.out.println("We're red");
+
+                return Alliance.Red;
+            }
+            else if (ally.get() == Alliance.Blue){
+                System.out.println("We're blue");
+                return Alliance.Blue;
+            }
+            else {
+                System.out.println("We didn't get alliance");
+                return Alliance.Blue;
+            }
+        }
+        else {
+            System.out.println("We didn't get alliance");
+            return Alliance.Blue;
+        }
     }
 
     public void setSpeed(int speed) {
