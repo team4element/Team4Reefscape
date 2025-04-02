@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "3rd cage to reef 1"
+            "pathName": "3rd cage to reef 1 Right"
           }
         },
         {
@@ -26,6 +26,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Reef 1",
   "choreoAuto": false
 }

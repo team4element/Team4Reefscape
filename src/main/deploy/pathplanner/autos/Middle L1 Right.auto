@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "4th cage to reef 3 left"
+            "pathName": "Middle RIght"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "level 2"
+            "name": "level 1"
           }
         },
         {
@@ -26,6 +26,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Reef 3",
+  "folder": null,
   "choreoAuto": false
 }
