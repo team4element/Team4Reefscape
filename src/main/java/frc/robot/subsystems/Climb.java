@@ -15,6 +15,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,6 +31,8 @@ public class Climb extends SubsystemBase{
     private PositionVoltage m_request;
     private TalonFXConfiguration config;
     private double m_hold_value;
+    public  double rightPosition;
+    public double leftPosition;
 
     //2.7 is max rotation or else brake battery
 
@@ -41,12 +45,12 @@ public class Climb extends SubsystemBase{
         TalonFXConfiguration config2 = new TalonFXConfiguration();
         config2.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
         config2.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
-        config2.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+       // config2.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
         config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
-        config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-        config.Slot0.kP = 1;
-        config2.Slot0.kP = 1;
+       // config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+        config.Slot0.kP = 5;
+        config2.Slot0.kP = 5;
 
         TalonFXConfigurator configurator = m_right.getConfigurator();
         m_right.getConfigurator().apply(config);
@@ -59,8 +63,8 @@ public class Climb extends SubsystemBase{
        if (m_right.getPosition().getValueAsDouble() >= 70){
            m_right.setControl(m_dutyCycle.withOutput(0));
            m_left.setControl(m_dutyCycle.withOutput(0));
-           m_right.setNeutralMode(NeutralModeValue.Brake);
-           m_left.setNeutralMode(NeutralModeValue.Brake);
+        //    m_right.setNeutralMode(NeutralModeValue.Brake);
+        //    m_left.setNeutralMode(NeutralModeValue.Brake);
        } else {
             m_right.setControl(m_dutyCycle.withOutput(speed));
             m_left.setControl(m_dutyCycle.withOutput(speed));
@@ -68,20 +72,34 @@ public class Climb extends SubsystemBase{
     }
 
     public void runMotorDown(double speed){
-       if(m_right.getPosition().getValueAsDouble() <= -37.2) {
+       if(m_right.getPosition().getValueAsDouble() <= -38) {
            m_right.setControl(m_dutyCycle.withOutput(0));
            m_left.setControl(m_dutyCycle.withOutput(0));
+        //    m_right.setNeutralMode(NeutralModeValue.Brake);
+        //    m_left.setNeutralMode(NeutralModeValue.Brake);
         } else {
             m_right.setControl(m_dutyCycle.withOutput(-speed));
             m_left.setControl(m_dutyCycle.withOutput(-speed));
         }
     }
 
+    public void oldMotorDown(double speed){
+        if(m_right.getPosition().getValueAsDouble() <= -31) {
+            m_right.setControl(m_dutyCycle.withOutput(0));
+            m_left.setControl(m_dutyCycle.withOutput(0));
+         //    m_right.setNeutralMode(NeutralModeValue.Brake);
+         //    m_left.setNeutralMode(NeutralModeValue.Brake);
+         } else {
+             m_right.setControl(m_dutyCycle.withOutput(-speed));
+             m_left.setControl(m_dutyCycle.withOutput(-speed));
+         }
+     }
+
     public void motorOff(){
         m_right.setControl(m_dutyCycle.withOutput(0));
         m_left.setControl(m_dutyCycle.withOutput(0));
-        m_right.setNeutralMode(NeutralModeValue.Brake);
-           m_left.setNeutralMode(NeutralModeValue.Brake);
+        // m_right.setNeutralMode(NeutralModeValue.Brake);
+        //    m_left.setNeutralMode(NeutralModeValue.Brake);
     }
     public void manualPivot(double speed){
         final double max_speed = .1;
@@ -101,6 +119,13 @@ public class Climb extends SubsystemBase{
 
     @Override
     public void periodic(){
+
+       rightPosition = m_right.getPosition().getValueAsDouble();
+       leftPosition = m_left.getPosition().getValueAsDouble();
+
+       SmartDashboard.putNumber("Left climb", m_left.get());
+       SmartDashboard.putNumber("Right climb", m_right.get());
+
        // System.out.println(m_climb.getRotorPosition() + " | " + m_climb.getPosition());
     }
     
