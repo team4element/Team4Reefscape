@@ -8,11 +8,9 @@ import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.LimelightHelpers;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CommandSwerveDrivetrain.coralStation;
@@ -61,15 +59,15 @@ public class turnToStation extends Command {
     double error = targetPose - currentPose;
   //  m_pid.enableContinuousInput(-180,180);
   //  double gyroValue = m_drivetrain.getPigeon2().getYaw().getValueAsDouble();
-    double output = m_pid.calculate(error) * m_maxSpeed * 1.5;
-    System.out.println("current" + m_drivetrain.getState().Pose.getRotation().getDegrees());
-    System.out.println("target" + m_drivetrain.targetPose(m_coralstation));
-    System.out.println("output"+ output);
+    double output = m_pid.calculate(error) * m_maxSpeed * 0.8;
+    //System.out.println("current" + m_drivetrain.getState().Pose.getRotation().getDegrees());
+    //System.out.println("target" + m_drivetrain.targetPose(m_coralstation));
+   // System.out.println("output"+ output);
    // System.out.println("gyro" + gyroValue);
-    System.out.println("error" + error);
+   // System.out.println("error" + error);
 
      m_drivetrain.setControl(
-      m_drive.withRotationalRate((-output))
+      m_drive.withRotationalRate((-output)).withVelocityX(-ControllerConstants.driverController.getLeftY() * m_maxSpeed)
       );
 
    }

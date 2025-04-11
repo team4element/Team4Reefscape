@@ -11,6 +11,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.LimelightHelpers;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision;
@@ -36,7 +37,7 @@ public class reefHorizontal extends Command {
     m_maxSpeed = maxSpeed;
     m_controller = controller; 
 
-     m_pid = new PIDController(0.5, 0, 0);
+     m_pid = new PIDController(0.08, 0, 0);
 
       m_drive = new SwerveRequest.RobotCentric()
       .withDeadband(VisionConstants.deadband)
@@ -49,22 +50,31 @@ public class reefHorizontal extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    if(ControllerConstants.driverController.x().getAsBoolean()){
     m_vision.switchPipeline(Pipeline.LEFT_PIPE);
+    } else if (ControllerConstants.driverController.b().getAsBoolean()){
+      m_vision.switchPipeline(Pipeline.RIGHT_PIPE);
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    currentPose = LimelightHelpers.getTY("");
+    currentPose = LimelightHelpers.getTX("");
     targetPose = 0;
     double error = targetPose - currentPose;
-    double output = m_pid.calculate(error) * m_maxSpeed * 0.5;
+    double output = m_pid.calculate(error) * -m_maxSpeed * 0.5;
 
-    m_drivetrain.setControl(
-      m_drive.withVelocityY(output).withVelocityX(-m_controller.getLeftY() * m_maxSpeed)
-      );
+    System.out.println(output);
 
-  }
+    if(LimelightHelpers.getTV("")){
+      m_drivetrain.setControl(
+      m_drive.withVelocityY(output).withVelocityX(-m_controller.getLeftY() * m_maxSpeed));
+    } else {
+      isFinished();
+    }
+    } 
+   // m_drivetrain.setControl(m_drive.withVelocityY(0).withVelocityX(0).withRotationalRate(0));
 
   // Called once the command ends or is interrupted.
   @Override

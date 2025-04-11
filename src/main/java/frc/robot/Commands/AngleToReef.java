@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveModule;
@@ -25,12 +26,13 @@ public class AngleToReef extends Command {
   CommandSwerveDrivetrain drivetrain;
   CommandXboxController controller;
   double m_max_speed;
-  PIDController thetaController=new PIDController(0.05, 0, 0);
+  PIDController thetaController=new PIDController(0.2, 0, 0);
   SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
-  .withDeadband(VisionConstants.deadband)
+  .withDeadband(VisionConstants.deadband*2)
   .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
   .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo);
   private double HexAngle(){
+
     Rotation2d angleToReef=drivetrain.getState().Pose.getTranslation().minus(DriverStation.getAlliance().get()==Alliance.Red?red_reef:blue_reef).getAngle();
     double snapped=Rotation2d.fromDegrees(((int)((angleToReef.getDegrees()+(30.*Math.signum(angleToReef.getDegrees())))/60.))*60.).getDegrees()+180;
 
@@ -48,7 +50,17 @@ public class AngleToReef extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    targetangle=HexAngle();
+    if(Math.abs(8.775-drivetrain.getState().Pose.getX())<2){
+      targetangle=DriverStation.getAlliance().get()==Alliance.Blue?-180:180;
+    }else if(ControllerConstants.operatorController.x().getAsBoolean()){
+      if(DriverStation.getAlliance().get()==Alliance.Red){
+        targetangle=drivetrain.getState().Pose.getY()>4?45:-45;
+      }else{
+        targetangle=drivetrain.getState().Pose.getY()>4?130:-130;
+      }
+    }else{
+      targetangle=HexAngle();
+    }
     thetaController.reset();
   }
 
@@ -60,7 +72,7 @@ public class AngleToReef extends Command {
       .withRotationalRate(thetaController.calculate(drivetrain.getState().Pose.getRotation().getDegrees(),targetangle))
       .withVelocityX(-controller.getLeftY() * m_max_speed)
       .withVelocityY(-controller.getLeftX() * m_max_speed));
-    targetangle=HexAngle();
+    //targetangle=HexAngle();
   }
 
   // Called once the command ends or is interrupted.

@@ -7,14 +7,11 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.Utils;
 
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.LimelightHelpers.LimelightResults;
 import frc.robot.LimelightHelpers.PoseEstimate;
 
 public class Vision extends SubsystemBase {
@@ -47,13 +44,17 @@ public class Vision extends SubsystemBase {
       double angleToGoalRadians = angleToGoalDegrees * VisionConstants.radianMeasurement;
       
       double heading=drivetrain.getState().Pose.getRotation().getDegrees();
-      LimelightHelpers.SetRobotOrientation("", heading, 0, 0, 0, 0, 0);
+      //LimelightHelpers.SetRobotOrientation("", heading, 0, 0, 0, 0, 0);
       measurement=LimelightHelpers.getBotPoseEstimate_wpiBlue("");
 
       if(measurement!=null){
-        if(measurement.pose.getX()!=0&&measurement.pose.getY()!=0&&measurement.avgTagDist<2.5){
-          drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(0.1*Math.pow(measurement.avgTagDist,2),0.1*Math.pow(measurement.avgTagDist,2),9999999999.0));
+        if(measurement.pose.getX()!=0&&measurement.pose.getY()!=0&&measurement.avgTagDist<1.5){
+          if(measurement.avgTagDist<0.5){
+            drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(0.001, 0.001, 0.001));
+          }else
+            drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(0.1*Math.pow(measurement.avgTagDist,2),0.1*Math.pow(measurement.avgTagDist,2),/*99999999.0*/10));
           drivetrain.addVisionMeasurement(measurement.pose, Utils.fpgaToCurrentTime(measurement.timestampSeconds));
+        
         }
       }
       // calculate distance

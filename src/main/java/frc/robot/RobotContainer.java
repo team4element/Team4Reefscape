@@ -16,18 +16,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Commands.AngleToReef;
-import frc.robot.Commands.ApproachApriltag;
-import frc.robot.Commands.ApriltagAllignment;
-import frc.robot.Commands.AutoMove;
 import frc.robot.Commands.BargeShot;
 import frc.robot.Commands.ClimbDown;
 import frc.robot.Commands.ClimbHold;
 import frc.robot.Commands.ClimbUp;
 import frc.robot.Commands.ElevateAndPivot;
-import frc.robot.Commands.HoldAngle;
 import frc.robot.Commands.IntakeAlgae;
 import frc.robot.Commands.Shift;
-import frc.robot.Commands.ToBargeHeight;
 import frc.robot.Commands.oldClimb;
 import frc.robot.Commands.reefHorizontal;
 import frc.robot.Commands.turnToStation;
@@ -40,8 +35,6 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.UpperJaw;
 import frc.robot.subsystems.ShuffleboardHelper;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.CommandSwerveDrivetrain.AutoMoveAction;
-import frc.robot.subsystems.CommandSwerveDrivetrain.coralStation;
 import frc.robot.subsystems.Vision.Pipeline;
 import frc.robot.subsystems.LowerJaw;
 import frc.robot.subsystems.Pivot;
@@ -119,7 +112,10 @@ public class RobotContainer {
 
         ControllerConstants.driverController.y().whileTrue(new turnToStation(drivetrain, MaxAngularRate));
         ControllerConstants.driverController.x().whileTrue(new reefHorizontal(m_vision, drivetrain, MaxSpeed, ControllerConstants.driverController));
-        ControllerConstants.driverController.b().whileTrue(new oldClimb(m_climb, .75));
+        ControllerConstants.driverController.b().whileTrue(new reefHorizontal(m_vision, drivetrain, MaxSpeed, ControllerConstants.driverController));
+        ControllerConstants.driverController.rightStick().whileTrue(new AngleToReef(drivetrain, ControllerConstants.driverController, MaxSpeed));
+
+        ControllerConstants.driverController.a().whileTrue(new oldClimb(m_climb, .75));
 
         ControllerConstants.driverController.rightBumper().onTrue(drivetrain.c_seedFieldRelative());
         ControllerConstants.driverController.leftBumper().whileTrue(
@@ -132,7 +128,7 @@ public class RobotContainer {
 
         ControllerConstants.driverController.start().onTrue(drivetrain.c_updateSpeed(1));
         ControllerConstants.driverController.back().onTrue(drivetrain.c_updateSpeed(-1));
-
+        //ControllerConstants.driverController.button(10).onTrue();
 
         // ControllerConstants.driverController.povLeft().whileTrue();
          // ControllerConstants.driverController.povRight().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.RIGHT_PIPE));
