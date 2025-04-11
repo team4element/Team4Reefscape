@@ -373,16 +373,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         REDRIGHT
       }
 
-    public double targetPose(coralStation coralStation){
-        switch(coralStation){
-            case BLUELEFT: return 54;
-            case BLUERIGHT: return -36;
-            case REDLEFT: return 144;
-            case REDRIGHT: return -126;
-        }
+    // public double targetPose(coralStation coralStation){
+    //     switch(coralStation){
+    //         case BLUELEFT: return 54;
+    //         case BLUERIGHT: return -36;
+    //         case REDLEFT: return 144;
+    //         case REDRIGHT: return -126;p
+    //     }
 
-        return 54;
-    }
+    //     return 54;
+    // }
 
     public Alliance getAlliance(){
         Optional<Alliance> ally = DriverStation.getAlliance();

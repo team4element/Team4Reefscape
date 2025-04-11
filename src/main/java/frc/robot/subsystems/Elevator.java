@@ -26,6 +26,7 @@ public class Elevator extends SubsystemBase {
     private CurrentLimitsConfigs m_limitConfig;
     private TalonFXConfigurator m_leftConfigurator;
     private TalonFXConfigurator m_rightConfigurator;
+    
     private double m_hold_value;
 
     // The different levels the elevator needs a setpoint for
