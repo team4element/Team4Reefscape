@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 /** Add your docs here. */
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -12,7 +11,6 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -60,7 +58,7 @@ public class Climb extends SubsystemBase{
         configurator.apply(m_limitConfig);
     }
     public void runMotorUp(double speed){
-       if (m_right.getPosition().getValueAsDouble() >= 70){
+       if (m_right.getPosition().getValueAsDouble() >= 90){
            m_right.setControl(m_dutyCycle.withOutput(0));
            m_left.setControl(m_dutyCycle.withOutput(0));
         //    m_right.setNeutralMode(NeutralModeValue.Brake);
@@ -72,7 +70,7 @@ public class Climb extends SubsystemBase{
     }
 
     public void runMotorDown(double speed){
-       if(m_right.getPosition().getValueAsDouble() <= -38) {
+       if(m_right.getPosition().getValueAsDouble() <= 0) {
            m_right.setControl(m_dutyCycle.withOutput(0));
            m_left.setControl(m_dutyCycle.withOutput(0));
         //    m_right.setNeutralMode(NeutralModeValue.Brake);
