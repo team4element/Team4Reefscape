@@ -47,8 +47,8 @@ public class Climb extends SubsystemBase{
         config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
         config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
        // config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-        config.Slot0.kP = 5;
-        config2.Slot0.kP = 5;
+        config.Slot0.kP = 7;
+        config2.Slot0.kP = 7;
 
         TalonFXConfigurator configurator = m_right.getConfigurator();
         m_right.getConfigurator().apply(config);
@@ -70,7 +70,7 @@ public class Climb extends SubsystemBase{
     }
 
     public void runMotorDown(double speed){
-       if(m_right.getPosition().getValueAsDouble() <= 0) {
+       if(m_right.getPosition().getValueAsDouble() <= 6.2) {
            m_right.setControl(m_dutyCycle.withOutput(0));
            m_left.setControl(m_dutyCycle.withOutput(0));
         //    m_right.setNeutralMode(NeutralModeValue.Brake);
