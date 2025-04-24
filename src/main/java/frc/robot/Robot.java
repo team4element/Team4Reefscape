@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -13,6 +14,11 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
+
+  private double teleStart;
+  private double autoStart;
+  private static double teleElapsedTime = 0.0;
+  private static double autoElapsedTime = 0.0;
 
   public Robot() {
 
@@ -39,6 +45,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    autoStart = Timer.getFPGATimestamp()/60;
+
     m_robotContainer.c_fieldRelative();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     System.out.println(m_autonomousCommand.getName());
@@ -51,13 +59,16 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    autoElapsedTime = (Timer.getFPGATimestamp()/60)- autoStart;
+  }
 
   @Override
   public void autonomousExit() {}
 
   @Override
   public void teleopInit() {
+    teleStart = Timer.getFPGATimestamp()/60;
     // m_robotContainer.c_fieldRelative();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
@@ -66,7 +77,9 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    teleElapsedTime = (Timer.getFPGATimestamp()/60) - teleStart;
+  }
 
   @Override
   public void teleopExit() {}

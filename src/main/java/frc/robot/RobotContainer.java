@@ -11,6 +11,8 @@ import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,7 +25,9 @@ import frc.robot.Commands.ClimbUp;
 import frc.robot.Commands.ElevateAndPivot;
 import frc.robot.Commands.IntakeAlgae;
 import frc.robot.Commands.Shift;
+import frc.robot.Commands.alignToBarge;
 import frc.robot.Commands.oldClimb;
+import frc.robot.Commands.recordValues;
 import frc.robot.Commands.reefHorizontal;
 import frc.robot.Commands.turnToStation;
 import frc.robot.Constants.ControllerConstants;
@@ -65,6 +69,9 @@ public class RobotContainer {
     public final Elevator m_elevator = new Elevator();
     public final Pivot    m_pivot    = new Pivot();
     public final Climb    m_climb    = new Climb();
+
+    private double teleStart;
+    private double autoStart;
 
     public RobotContainer() {
 
@@ -115,16 +122,14 @@ public class RobotContainer {
         ControllerConstants.driverController.b().whileTrue(new reefHorizontal(m_vision, drivetrain, MaxSpeed, ControllerConstants.driverController));
         ControllerConstants.driverController.rightStick().whileTrue(new AngleToReef(drivetrain, ControllerConstants.driverController, MaxSpeed));
 
-        ControllerConstants.driverController.a().whileTrue(new oldClimb(m_climb, .75));
-
         ControllerConstants.driverController.rightBumper().onTrue(drivetrain.c_seedFieldRelative());
         ControllerConstants.driverController.leftBumper().whileTrue(
             drivetrain.applyRequest(()->rcdrive.withVelocityX(ControllerConstants.yTranslationModifier.apply(-ControllerConstants.driverController.getLeftY() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed))) // Drive forward with negative Y (forward)
             .withVelocityY(ControllerConstants.xTranslationModifier.apply(-ControllerConstants.driverController.getLeftX() * MaxSpeed * drivetrain.speedToDouble(drivetrain.m_speed))) // Drive left with negative X (left)
              .withRotationalRate(ControllerConstants.zRotationModifier.apply(-ControllerConstants.driverController.getRightX() * MaxAngularRate * drivetrain.speedToDouble(drivetrain.m_speed)))) // Drive counterclockwise with negative X (left))
          );
-         ControllerConstants.driverController.leftTrigger().whileTrue(new ClimbDown(m_climb, .75));
-         ControllerConstants.driverController.rightTrigger().whileTrue(new ClimbUp(m_climb, .75));
+         ControllerConstants.driverController.leftTrigger().whileTrue(new ClimbDown(m_climb, .45));
+         ControllerConstants.driverController.rightTrigger().whileTrue(new ClimbUp(m_climb, .45));
 
         ControllerConstants.driverController.start().onTrue(drivetrain.c_updateSpeed(1));
         ControllerConstants.driverController.back().onTrue(drivetrain.c_updateSpeed(-1));
@@ -134,12 +139,15 @@ public class RobotContainer {
          // ControllerConstants.driverController.povRight().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.RIGHT_PIPE));
        ControllerConstants.driverController.povUp().onTrue(m_vision.c_ChangePipeline(1));
         ControllerConstants.driverController.povDown().onTrue(m_vision.c_ChangePipeline(-1));
+        ControllerConstants.driverController.povLeft().whileTrue(new oldClimb(m_climb, .45));
+        ControllerConstants.driverController.povRight().whileTrue(new alignToBarge(drivetrain, MaxSpeed));
 
         //Operator Controls
         ControllerConstants.operatorController.leftBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed));
         ControllerConstants.operatorController.rightBumper().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.topOuttakeSpeed));
 
          ControllerConstants.operatorController.povUp().whileTrue(m_lowerJaw.c_intakeCoral(JawConstants.topOuttakeSpeed/2));
+         ControllerConstants.operatorController.povDown().whileTrue(new recordValues(m_elevator, m_pivot));
 
         ControllerConstants.operatorController.leftTrigger().whileTrue(new IntakeAlgae(m_upperJaw, m_lowerJaw, .7, .7));
        ControllerConstants.operatorController.rightTrigger().whileTrue(new IntakeAlgae(m_upperJaw, m_lowerJaw, JawConstants.topOuttakeSpeed, JawConstants.bottomOuttakeSpeed));
