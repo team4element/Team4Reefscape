@@ -56,7 +56,7 @@ public class AngleToReef extends Command {
       if(DriverStation.getAlliance().get()==Alliance.Red){
         targetangle=drivetrain.getState().Pose.getY()>4?45:-45;
       }else{
-        targetangle=drivetrain.getState().Pose.getY()>4?130:-130;
+        targetangle=drivetrain.getState().Pose.getY()>4?125:-135;
       }
     }else{
       targetangle=HexAngle();
