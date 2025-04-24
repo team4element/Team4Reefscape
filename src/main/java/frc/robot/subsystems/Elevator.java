@@ -147,6 +147,11 @@ public class Elevator extends SubsystemBase {
         return Math.abs(input) > deadband ? input : 0; 
     }
 
+    public void recordValue(){
+        System.out.println("elevator regular" + m_leftLeader.get());
+        System.out.println("elevator position" + m_leftLeader.getPosition());
+    }
+
     public Command c_moveElevator() {
         return Commands.run(() -> setMotors(my_deadband(-ControllerConstants.operatorController.getRightY()) * .9), this);
     }

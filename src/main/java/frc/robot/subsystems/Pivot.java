@@ -76,6 +76,11 @@ public class Pivot extends SubsystemBase {
     return startEnd(() -> goToSetPoint(positionToSetpoint(position), slot), () -> jawOff());
   }
 
+  public void recordValue(){
+    System.out.println("pivot regular" + m_jawPivot.get());
+    System.out.println("pivot position" + m_jawPivot.getPosition());
+}
+
   public void resetPivotEncoder() {
     m_jawPivot.setPosition(0);
   }
