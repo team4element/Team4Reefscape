@@ -18,6 +18,7 @@ import frc.robot.Commands.ApproachApriltag;
 import frc.robot.Commands.BargeShot;
 import frc.robot.Commands.ClimbDown;
 import frc.robot.Commands.ClimbUp;
+import frc.robot.Commands.DebugField;
 import frc.robot.Commands.ElevateAndPivot;
 import frc.robot.Commands.HoldAngle;
 import frc.robot.Commands.IntakeAlgae;
@@ -97,7 +98,7 @@ public class RobotContainer {
         ControllerConstants.driverController.povLeft().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.LEFT_PIPE));
         ControllerConstants.driverController.povRight().whileTrue(new Shift(drivetrain, m_vision, MaxSpeed, Pipeline.RIGHT_PIPE));
        
-        ControllerConstants.driverController.leftBumper().onTrue(drivetrain.c_seedFieldRelative());
+        ControllerConstants.driverController.leftBumper().onTrue(new DebugField(drivetrain));
         ControllerConstants.driverController.povUp().onTrue(new Vision().c_ChangePipeline(1));
         ControllerConstants.driverController.povDown().onTrue(new Vision().c_ChangePipeline(-1));
         ControllerConstants.driverController.leftTrigger().whileTrue(new ClimbDown(m_climb, 1));

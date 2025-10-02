@@ -296,6 +296,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    //this doesn't change the robot's movement for some reason
     public Command c_seedFieldRelative() {
         return runOnce(() -> seedFieldCentric());
     }
