@@ -53,15 +53,15 @@ public class RobotContainer {
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(.4).withRotationalDeadband(.4) // Add a 10% deadband //0.3
+            .withDeadband(1).withRotationalDeadband(1) // Add a 10% deadband //0.3
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage).withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective); // Use open-loop control for drive motors
 
 
             private final SwerveRequest.RobotCentric rcdrive = new SwerveRequest.RobotCentric()
-            .withDeadband(.4).withRotationalDeadband(.4) // Add a 10% deadband //0.3
+            .withDeadband(1).withRotationalDeadband(1) // Add a 10% deadband //0.3
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final Telemetry logger = new Telemetry(MaxSpeed);
-
+ 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final Vision m_vision     = new Vision(drivetrain);
     public final UpperJaw m_upperJaw = new UpperJaw();
@@ -81,9 +81,11 @@ public class RobotContainer {
         NamedCommands.registerCommand("level 2", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_2, 0, 0).withTimeout(1));
         NamedCommands.registerCommand("level 3", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_3, 0, 0).withTimeout(1));
         NamedCommands.registerCommand("level 4", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_4, 0, 0).withTimeout(1));
-        NamedCommands.registerCommand("outtake coral", m_lowerJaw.c_intakeCoral(-0.12).withTimeout(1));
+        NamedCommands.registerCommand("CoralStation", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.CORAL_STATION, 0, 0).withTimeout(2));
+        NamedCommands.registerCommand("outtake coral", m_lowerJaw.c_intakeCoral(-0.12).withTimeout(1.5));
         NamedCommands.registerCommand("Lower elevator", new ElevateAndPivot(m_elevator, m_pivot, Elevator.Level.LEVEL_1, 1, 0).withTimeout(1.5));
         NamedCommands.registerCommand("Intake Algae", new IntakeAlgae(m_upperJaw, m_lowerJaw, 0.7, 0.7));
+        NamedCommands.registerCommand("IntakeCoral", m_lowerJaw.c_intakeCoral(JawConstants.intakeSpeed).withTimeout(1.5));
         // creates a menu on shuffle board for autons
         sendableAuton = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", sendableAuton);
