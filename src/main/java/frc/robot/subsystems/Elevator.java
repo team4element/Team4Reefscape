@@ -54,7 +54,7 @@ public class Elevator extends SubsystemBase {
         config.Slot0.kA = .005;
 
         //Slot1 is a slower version of PID
-        config.Slot1.kP = 3;
+        config.Slot1.kP = 1;
         config.Slot1.kD = .1;
         config.Slot1.kV = .005;
         config.Slot1.kA = .005;
@@ -62,7 +62,7 @@ public class Elevator extends SubsystemBase {
         m_rightFollower = new TalonFX(ElevatorConstants.rightFollowerId);
         m_leftLeader = new TalonFX(ElevatorConstants.leftLeaderId);
 
-        m_request = new PositionVoltage(0).withSlot(0);
+        m_request = new PositionVoltage(0).withSlot(1);
         m_limitConfig = new CurrentLimitsConfigs();
 
         m_leftDutyCycle = new DutyCycleOut(1);
@@ -163,11 +163,11 @@ public class Elevator extends SubsystemBase {
 
     public double goToLevel(Level level){
         switch(level){
-            case LEVEL_1: return 1.5;
-            case LEVEL_2: return 3.65;
-            case LEVEL_3: return 5.6;
+            case LEVEL_1: return 1.3;
+            case LEVEL_2: return 3.45;
+            case LEVEL_3: return 5.4;
             case LEVEL_4: return 7.6;
-            case CORAL_STATION: return 3.65;
+            case CORAL_STATION: return 3.45;
         }
 
         return 3;
@@ -189,15 +189,15 @@ public class Elevator extends SubsystemBase {
     public double levelToSetPoint(Level level) {
         switch (level) {
             case LEVEL_1:
-                return 1.5;
+                return 1.3; //1.5
             case LEVEL_2:
-                return 3.65;
+                return 3.45; //3.65
             case LEVEL_3:
-                return 5.6;
+                return 5.4; //5.6
             case LEVEL_4:
                 return 7.3;
             case CORAL_STATION:
-                return 3.65;
+                return 3.45; //3.65
         }
         return 3;
     }

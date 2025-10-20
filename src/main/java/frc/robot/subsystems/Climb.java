@@ -70,7 +70,7 @@ public class Climb extends SubsystemBase{
     }
 
     public void runMotorDown(double speed){
-       if(m_right.getPosition().getValueAsDouble() <= 6.2) {
+       if(m_right.getPosition().getValueAsDouble() <= -22.2) {
            m_right.setControl(m_dutyCycle.withOutput(0));
            m_left.setControl(m_dutyCycle.withOutput(0));
         //    m_right.setNeutralMode(NeutralModeValue.Brake);
