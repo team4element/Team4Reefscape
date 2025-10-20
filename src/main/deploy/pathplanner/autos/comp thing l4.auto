@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Copy of Middle coral"
+            "pathName": "4th cage to reef 3 left"
           }
         },
         {
@@ -21,17 +21,11 @@
           "data": {
             "name": "outtake coral"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "level 1"
-          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "L4",
+  "folder": null,
   "choreoAuto": false
 }

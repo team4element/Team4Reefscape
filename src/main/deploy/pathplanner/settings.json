@@ -9,9 +9,10 @@
     "reef 6"
   ],
   "autoFolders": [
-    "Reef 6",
+    "L4",
     "Reef 1",
-    "Reef 3"
+    "Reef 3",
+    "Reef 6"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,

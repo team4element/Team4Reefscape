@@ -45,6 +45,36 @@
           "data": {
             "name": "IntakeCoral"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "level 1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "station to reef 4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "level 4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "outtake coral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "level 1"
+          }
         }
       ]
     }
